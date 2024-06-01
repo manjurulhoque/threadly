@@ -7,9 +7,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { useAddThreadMutation } from "@/store/threads/threadApi";
+import { toast } from "react-toastify";
 
 interface Props {
 }
@@ -37,19 +37,18 @@ const PostThread = (Props) => {
     }
 
     const onSubmit = async (values: z.infer<any>) => {
-        toast({
-            title: "Hello!",
-            description: "This is a custom toast notification.",
-        });
-        // try {
-        //     await addThread({
-        //         content: values.content,
-        //     }).unwrap();
-        //     router.push("/");
-        //     useToast()
-        // } catch (error) {
-        //     console.error(error);
-        // }
+        try {
+            await addThread({
+                content: values.content,
+            }).unwrap();
+            toast.success("Thread posted successfully");
+            setTimeout(() => {
+                router.push("/");
+            }, 1000);
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to post thread");
+        }
     };
 
     return (
@@ -60,7 +59,7 @@ const PostThread = (Props) => {
             >
                 <FormField
                     control={form.control}
-                    name='thread'
+                    name='content'
                     render={({field}) => (
                         <FormItem className='flex w-full flex-col gap-3'>
                             <FormLabel className='text-base-semibold text-light-2'>
