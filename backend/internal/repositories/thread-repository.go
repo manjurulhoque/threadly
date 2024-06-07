@@ -31,6 +31,6 @@ func (r *threadRepository) GetThreadsForUser(userId uint) ([]models.Thread, erro
 
 func (r *threadRepository) GetThreadById(threadId uint) (*models.Thread, error) {
 	var thread models.Thread
-	err := r.db.Where("id = ?", threadId).First(&thread).Error
+	err := r.db.Where("id = ?", threadId).Preload("User").First(&thread).Error
 	return &thread, err
 }

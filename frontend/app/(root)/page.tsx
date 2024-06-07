@@ -5,7 +5,7 @@ import { permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: 'Home',
+    title: 'Home - Threadly',
     description: '',
 }
 
@@ -17,9 +17,9 @@ const Page = async ({searchParams,}: { searchParams: { [key: string]: string | u
 
     return (
         <>
-            <h1 className='head-text text-left'>Home</h1>
+            <h1 className="head-text text-left">Home</h1>
 
-            <section className='mt-9 flex flex-col gap-10'>
+            <section className="mt-9 flex flex-col gap-10">
                 <p className='no-result'>No threads found</p>
             </section>
         </>
