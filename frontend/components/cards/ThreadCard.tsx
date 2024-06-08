@@ -10,7 +10,7 @@ interface Props {
 
 function ThreadCard({thread}: Props) {
     let isComment = false;
-    let {id, content, parentId, createdAt} = thread;
+    let {id, content, parentId, createdAt, user} = thread;
     return (
         <article
             className={`flex w-full flex-col rounded-xl ${
@@ -20,9 +20,9 @@ function ThreadCard({thread}: Props) {
             <div className='flex items-start justify-between'>
                 <div className='flex w-full flex-1 flex-row gap-4'>
                     <div className='flex flex-col items-center'>
-                        <Link href={`/profile/${author.id}`} className='relative h-11 w-11'>
+                        <Link href={`/profile/${user.id}`} className='relative h-11 w-11'>
                             <Image
-                                src={author.image}
+                                src={user.image}
                                 alt='user_community_image'
                                 fill
                                 className='cursor-pointer rounded-full'
@@ -33,9 +33,9 @@ function ThreadCard({thread}: Props) {
                     </div>
 
                     <div className='flex w-full flex-col'>
-                        <Link href={`/profile/${author.id}`} className='w-fit'>
+                        <Link href={`/profile/${user.id}`} className='w-fit'>
                             <h4 className='cursor-pointer text-base-semibold text-light-1'>
-                                {author.name}
+                                {user.name}
                             </h4>
                         </Link>
 
@@ -74,41 +74,12 @@ function ThreadCard({thread}: Props) {
                                     className='cursor-pointer object-contain'
                                 />
                             </div>
-
-                            {isComment && comments.length > 0 && (
-                                <Link href={`/thread/${id}`}>
-                                    <p className='mt-1 text-subtle-medium text-gray-1'>
-                                        {comments.length} repl{comments.length > 1 ? "ies" : "y"}
-                                    </p>
-                                </Link>
-                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* TODO: Delete thread here*/}
             </div>
-
-            {!isComment && comments.length > 0 && (
-                <div className='ml-1 mt-3 flex items-center gap-2'>
-                    {comments.slice(0, 2).map((comment, index) => (
-                        <Image
-                            key={index}
-                            src={comment.author.image}
-                            alt={`user_${index}`}
-                            width={24}
-                            height={24}
-                            className={`${index !== 0 && "-ml-5"} rounded-full object-cover`}
-                        />
-                    ))}
-
-                    <Link href={`/thread/${id}`}>
-                        <p className='mt-1 text-subtle-medium text-gray-1'>
-                            {comments.length} repl{comments.length > 1 ? "ies" : "y"}
-                        </p>
-                    </Link>
-                </div>
-            )}
         </article>
     );
 }

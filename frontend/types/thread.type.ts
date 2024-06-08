@@ -1,3 +1,5 @@
+import { User } from "@/types/user.type";
+
 export interface Thread {
     id: number;
     content: string;
@@ -5,4 +7,5 @@ export interface Thread {
     createdAt: string;
     updatedAt: string;
     deletedAt: string;
+    user: User;
 }
