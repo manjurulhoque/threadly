@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 type User struct {
 	BaseModel
 	Email     string `json:"email" gorm:"unique;not null"`
@@ -14,6 +16,20 @@ type User struct {
 
 func (u *User) TableName() string {
 	return "users"
+}
+
+// FollowersCount Get the number of followers for a user
+func (u *User) FollowersCount(db *gorm.DB) int64 {
+	var count int64
+	db.Model(&Follow{}).Where("followee_id = ?", u.ID).Count(&count)
+	return count
+}
+
+// FollowingCount Get the number of users a user is following
+func (u *User) FollowingCount(db *gorm.DB) int64 {
+	var count int64
+	db.Model(&Follow{}).Where("follower_id = ?", u.ID).Count(&count)
+	return count
 }
 
 type PublicUser struct {
