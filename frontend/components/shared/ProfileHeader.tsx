@@ -7,13 +7,15 @@ interface Props {
 }
 
 function ProfileHeader({ user }: Props) {
+    let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
+
     return (
         <div className='flex w-full flex-col justify-start'>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-3'>
                     <div className='relative h-20 w-20 object-cover'>
                         {
-                            user.image === "" ? (
+                            userImage === "" ? (
                                 <div
                                     className="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
                                     <svg className="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor"
@@ -24,7 +26,7 @@ function ProfileHeader({ user }: Props) {
                                     </svg>
                                 </div>
                             ) : <Image
-                                src={user.image}
+                                src={userImage}
                                 alt='user_image'
                                 fill
                                 className='cursor-pointer rounded-full'

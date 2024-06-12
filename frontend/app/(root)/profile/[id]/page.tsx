@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserSession } from "@/types/user-session.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { fetchUser } from "@/lib/actions/user.actions";
 
 export const metadata = {
     title: 'Profile',
@@ -21,11 +22,13 @@ async function Page({ params }: { params: { id: string } }) {
     if (!user) {
         permanentRedirect('/');
     }
+    const userInfo = await fetchUser(user.id);
+    console.log(userInfo);
     // if (!userInfo?.onboarded) redirect("/onboarding");
 
     return (
         <section>
-            <ProfileHeader user={user}/>
+            <ProfileHeader user={userInfo.data}/>
 
             <div className='mt-9'>
                 <Tabs defaultValue='threads' className='w-full'>
