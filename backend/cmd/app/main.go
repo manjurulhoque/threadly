@@ -65,7 +65,8 @@ func main() {
 		api.POST("/login", userHandler.Login)
 		api.POST("/token/refresh", userHandler.Refresh)
 
-		api.POST("/thread", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
+		api.POST("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
+		api.GET("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsForUser)
 	}
 
 	// run the server

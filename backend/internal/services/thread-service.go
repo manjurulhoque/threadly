@@ -7,6 +7,7 @@ import (
 
 type ThreadService interface {
 	CreateThread(thread models.Thread) error
+	GetThreadsForUser(userId uint) ([]models.Thread, error)
 }
 
 type threadService struct {
@@ -19,4 +20,8 @@ func NewThreadService(repo repositories.ThreadRepository) ThreadService {
 
 func (s *threadService) CreateThread(thread models.Thread) error {
 	return s.threadRepo.CreateThread(&thread)
+}
+
+func (s *threadService) GetThreadsForUser(userId uint) ([]models.Thread, error) {
+	return s.threadRepo.GetThreadsForUser(userId)
 }

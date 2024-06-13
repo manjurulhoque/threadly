@@ -16,6 +16,22 @@ func NewThreadHandler(threadService services.ThreadService) *ThreadHandler {
 	return &ThreadHandler{threadService: threadService}
 }
 
+func (h *ThreadHandler) GetThreadsForUser(c *gin.Context) {
+	userId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	threads, err := h.threadService.GetThreadsForUser(userId.(uint))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"threads": threads})
+}
+
 // CreateThread Create thread handler
 func (h *ThreadHandler) CreateThread(c *gin.Context) {
 	var input struct {
