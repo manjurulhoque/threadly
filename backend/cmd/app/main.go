@@ -38,10 +38,13 @@ func main() {
 	defer db.CloseDB(db.DB)
 
 	userRepo := repositories.NewUserRepository(db.DB)
+	threadRepo := repositories.NewThreadRepository(db.DB)
 
 	userService := services.NewUserService(userRepo)
+	threadService := services.NewThreadService(threadRepo)
 
 	userHandler := handlers.NewUserHandler(userService)
+	threadHandler := handlers.NewThreadHandler(threadService)
 
 	router.Static("/uploads", "./uploads")
 
@@ -60,6 +63,8 @@ func main() {
 		api.POST("/register", userHandler.Register)
 		api.POST("/login", userHandler.Login)
 		api.POST("/token/refresh", userHandler.Refresh)
+
+		api.POST("/thread", threadHandler.CreateThread)
 	}
 
 	// run the server
