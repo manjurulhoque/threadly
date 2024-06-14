@@ -7,6 +7,7 @@ import (
 	"github.com/manjurulhoque/threadly/backend/internal/config"
 	"github.com/manjurulhoque/threadly/backend/internal/db"
 	"github.com/manjurulhoque/threadly/backend/internal/handlers"
+	"github.com/manjurulhoque/threadly/backend/internal/middlewares"
 	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/repositories"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
@@ -64,7 +65,7 @@ func main() {
 		api.POST("/login", userHandler.Login)
 		api.POST("/token/refresh", userHandler.Refresh)
 
-		api.POST("/thread", threadHandler.CreateThread)
+		api.POST("/thread", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
 	}
 
 	// run the server
