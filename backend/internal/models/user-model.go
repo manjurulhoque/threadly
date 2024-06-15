@@ -11,3 +11,19 @@ type User struct {
 	Bio       string `json:"bio"`
 	Onboarded bool   `json:"onboarded"`
 }
+
+func (u *User) TableName() string {
+	return "users"
+}
+
+type ThreadUser struct {
+	Id       uint   `json:"id"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Image    string `json:"image"`
+	Bio      string `json:"bio"`
+}
+
+func (u *ThreadUser) TableName() string {
+	return "users"
+}

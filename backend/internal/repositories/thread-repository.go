@@ -25,7 +25,7 @@ func (r *threadRepository) CreateThread(thread *models.Thread) error {
 
 func (r *threadRepository) GetThreadsForUser(userId uint) ([]models.Thread, error) {
 	var threads []models.Thread
-	err := r.db.Where("user_id = ?", userId).Find(&threads).Error
+	err := r.db.Where("user_id = ?", userId).Preload("User").Find(&threads).Error
 	return threads, err
 }
 
