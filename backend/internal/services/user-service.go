@@ -11,6 +11,12 @@ import (
 	"time"
 )
 
+// Define constants for token expiration
+const (
+	accessTokenExpiry  = time.Minute * 60
+	refreshTokenExpiry = time.Hour * 24 * 7
+)
+
 type UserService interface {
 	RegisterUser(username, name, email, password string) error
 	LoginUser(email, password string) (string, string, error) // Returns access and refresh tokens
@@ -77,12 +83,12 @@ func (s *userService) LoginUser(email, password string) (string, string, error) 
 	}
 
 	// Generate Access and Refresh Tokens
-	accessToken, err := s.generateToken(user, time.Hour*24)
+	accessToken, err := s.generateToken(user, accessTokenExpiry)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := s.generateToken(user, time.Hour*24)
+	refreshToken, err := s.generateToken(user, refreshTokenExpiry)
 	if err != nil {
 		return "", "", err
 	}
@@ -90,24 +96,13 @@ func (s *userService) LoginUser(email, password string) (string, string, error) 
 	return accessToken, refreshToken, nil
 }
 
-// Generate JWT Token
+// generateToken Generate JWT Token
 func (s *userService) generateToken(user *models.User, expiry time.Duration) (string, error) {
-	now := time.Now()
-	//token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	//	"sub":     user.ID,
-	//	"name":    user.Name,
-	//	"email":   user.Email,
-	//	"isAdmin": user.IsAdmin,
-	//	"exp":     time.Now().Add(expiry).Unix(),
-	//	"iat":     now.Unix(),
-	//	"jti":     uuid.New().String(),
-	//})
-
 	claims := JWTCustomClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   fmt.Sprintf("%d", user.ID),
-			ExpiresAt: jwt.NewNumericDate(now.Add(expiry)),
-			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiry)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			ID:        uuid.New().String(),
 		},
 		IsAdmin: user.IsAdmin,
@@ -117,7 +112,6 @@ func (s *userService) generateToken(user *models.User, expiry time.Duration) (st
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
 	return token.SignedString(jwtSecret)
 }
 
@@ -159,10 +153,7 @@ func (s *userService) VerifyToken(tokenString string) (*JWTCustomClaims, error) 
 		return nil, err
 	}
 	claims, ok := token.Claims.(*JWTCustomClaims)
-	if !ok {
-		return nil, errors.New("unauthorized")
-	}
-	if !token.Valid {
+	if !ok || !token.Valid {
 		return nil, errors.New("unauthorized")
 	}
 	return claims, nil
