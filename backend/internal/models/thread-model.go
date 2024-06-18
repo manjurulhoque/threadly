@@ -2,8 +2,8 @@ package models
 
 type Thread struct {
 	BaseModel
-	Text        string `json:"text"`
-	UserID      uint   `json:"user_id"`
+	Content     string `json:"content" gorm:"not null"`
+	UserID      uint   `json:"user_id" gorm:"column:user_id;not null"`
 	CommunityId uint   `json:"community_id" gorm:"column:community_id;null"`
 	ParentId    *uint  `json:"parent_id" gorm:"column:parent_id,index"` //Adding an index to the ParentID field (gorm:"index") can improve query performance when retrieving child threads.
 
