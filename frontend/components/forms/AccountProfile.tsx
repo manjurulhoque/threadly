@@ -31,7 +31,7 @@ const AccountProfile = ({user, btnTitle}) => {
     const onSubmit = async (values: any) => {
         const blob = values.profile_photo;
         const formData = new FormData();
-        if (blob) formData.append("image", blob);
+        if (blob && blob instanceof File) formData.append("image", blob);
         formData.append("name", values.name);
         formData.append("username", values.username);
         formData.append("bio", values.bio);
