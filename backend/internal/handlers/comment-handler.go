@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
+	"github.com/manjurulhoque/threadly/backend/pkg/utils"
 	"net/http"
 )
 
@@ -29,6 +30,12 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	errs := utils.TranslateError(input)
+	if errs != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errs})
 		return
 	}
 
