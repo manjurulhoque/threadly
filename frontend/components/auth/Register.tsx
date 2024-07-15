@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { Loader } from "lucide-react";
 
 const Register = () => {
     const [isClient, setIsClient] = useState(false);
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const {
         register,
@@ -17,6 +19,7 @@ const Register = () => {
     } = useForm();
 
     const onSubmit = async (data) => {
+        setIsLoading(true);
         setMessage("");
         try {
             const response = await fetch('/api/register', {
@@ -42,6 +45,7 @@ const Register = () => {
             console.error(error);
             toast.error('An unexpected error occurred');
         }
+        setIsLoading(false);
     }
 
     useEffect(() => {
@@ -143,7 +147,11 @@ const Register = () => {
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                             >
-                                Register
+                                {isLoading ? (
+                                    <Loader className="animate-spin w-5 h-5 mr-2" />
+                                ) : (
+                                    <span>Register</span>
+                                )}
                             </button>
                         </div>
                     </form>
