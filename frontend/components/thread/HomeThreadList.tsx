@@ -9,8 +9,6 @@ const HomeThreadList = () => {
     const [mounted, setMounted] = useState(false);
     const threads = data?.threads || [];
 
-    console.log(threads);
-
     // Ensure the component is only rendered after it's mounted on the client
     useEffect(() => {
         setMounted(true);
@@ -32,7 +30,7 @@ const HomeThreadList = () => {
                 ) : (
                     <section className="mt-9 flex flex-col gap-10">
                         {threads.map((thread) => (
-                            <ThreadCard thread={thread} />
+                            <ThreadCard thread={thread} key={thread.id}/>
                         ))}
                     </section>
                 )
