@@ -67,6 +67,7 @@ func main() {
 
 		api.POST("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
 		api.GET("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsForUser)
+		api.GET("/threads/:id", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadById)
 	}
 
 	// run the server
