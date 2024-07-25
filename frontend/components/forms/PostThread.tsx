@@ -74,16 +74,18 @@ const PostThread = (Props) => {
                     )}
                 />
 
-                <Button type='submit' className='dark:bg-primary-500' disabled={isLoading}>
-                    {isLoading ? (
-                        <Loader className="animate-spin w-5 h-5 mr-2" />
-                    ) : (
-                        <span>Post Thread</span>
-                    )}
-                </Button>
+                <div className="flex justify-end">
+                    <Button type='submit' className='dark:bg-primary-500' disabled={isLoading}>
+                        {isLoading ? (
+                            <Loader className="animate-spin w-5 h-5 mr-2"/>
+                        ) : (
+                            <span>Post Thread</span>
+                        )}
+                    </Button>
+                </div>
             </form>
         </Form>
-    );
+);
 }
 
 export default PostThread;
