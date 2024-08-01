@@ -11,6 +11,10 @@ import { UserSession } from "@/types/user-session.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 
+export const metadata = {
+    title: 'Profile',
+}
+
 async function Page({ params }: { params: { id: string } }) {
     const data: UserSession | null = await getServerSession(authOptions);
     const user = data?.user;
@@ -21,13 +25,7 @@ async function Page({ params }: { params: { id: string } }) {
 
     return (
         <section>
-            <ProfileHeader
-                authUserId={user.id}
-                name={user.name}
-                username={user.username}
-                imgUrl={user.image}
-                bio={user.bio}
-            />
+            <ProfileHeader user={user}/>
 
             <div className='mt-9'>
                 <Tabs defaultValue='threads' className='w-full'>
