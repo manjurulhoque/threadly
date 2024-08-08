@@ -65,3 +65,14 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Thread created successfully"})
 }
+
+func (h *ThreadHandler) GetThreadById(c *gin.Context) {
+	threadId := c.Param("id")
+	thread, err := h.threadService.GetThreadById(utils.StringToUint(threadId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"thread": thread})
+}
