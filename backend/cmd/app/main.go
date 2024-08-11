@@ -27,7 +27,7 @@ func init() {
 		panic(err)
 	}
 
-	err = db.DB.AutoMigrate(&models.User{}, &models.Community{}, &models.Thread{}, &models.Comment{})
+	err = db.DB.AutoMigrate(&models.User{}, &models.Community{}, &models.Thread{}, &models.Comment{}, &models.Follow{})
 	if err != nil {
 		slog.Error("Error migrating database", "error", err.Error())
 		panic(fmt.Sprintf("Error migrating database: %v", err))
@@ -80,6 +80,8 @@ func main() {
 
 		api.POST("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CreateComment)
 		api.GET("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CommentsByThreadId)
+
+		api.POST("/users/:id/follow", middlewares.AuthMiddleware(userRepo, userService), handlers.FollowUser)
 	}
 
 	// run the server
