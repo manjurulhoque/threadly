@@ -4,6 +4,7 @@ type User struct {
 	BaseModel
 	Email     string `json:"email" gorm:"unique;not null"`
 	Name      string `json:"name" gorm:"not null"`
+	Username  string `json:"username" gorm:"unique;not null"`
 	Password  string `json:"-" gorm:"not null"`
 	IsAdmin   bool   `json:"is_admin"`
 	Image     string `json:"image"`
