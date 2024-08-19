@@ -84,6 +84,23 @@ const Register = () => {
                         </div>
 
                         <div>
+                            <label htmlFor="username" className="block text-sm/6 font-medium text-white">
+                                Username
+                            </label>
+                            <div className="mt-2">
+                                <input
+                                    {...register("username", {required: true})}
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    required
+                                    autoComplete="username"
+                                    className="block w-full rounded-md border-0 bg-white/5 py-1.5 text-white shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm/6"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
                             <label htmlFor="email" className="block text-sm/6 font-medium text-white">
                                 Email
                             </label>
