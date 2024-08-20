@@ -11,9 +11,12 @@ import BottomBar from "@/components/shared/BottomBar";
 const inter = Inter({subsets: ["latin"]});
 
 export const metadata: Metadata = {
-    title: "Threadly",
-    description: "A Next.js 14 Meta Threads application",
-};
+    title: {
+        template: '%s - Threadly',
+        default: '',
+    },
+    description: '',
+}
 
 export default function RootLayout({children}: { children: React.ReactNode; }) {
     return (

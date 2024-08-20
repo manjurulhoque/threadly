@@ -1,5 +1,9 @@
 import PostThread from "@/components/forms/PostThread";
 
+export const metadata = {
+    title: "Create Thread",
+}
+
 const Page = async () => {
     return (
         <>

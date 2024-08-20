@@ -18,7 +18,7 @@ function PostThread({userId}: Props) {
 
     // const { organization } = useOrganization();
 
-    const form = useForm < z.infer<any>({
+    const form = useForm < z.infer<any>>({
         // resolver: zodResolver(ThreadValidation),
         defaultValues: {
             thread: "",
