@@ -22,6 +22,7 @@ type UserService interface {
 	LoginUser(email, password string) (string, string, error) // Returns access and refresh tokens
 	RefreshToken(refreshToken string) (string, error)         // Returns new access token
 	VerifyToken(token string) (*JWTCustomClaims, error)
+	GetUserById(userId uint) (*models.PublicUser, error)
 }
 
 var jwtSecret = []byte("ABC123")
@@ -157,4 +158,21 @@ func (s *userService) VerifyToken(tokenString string) (*JWTCustomClaims, error) 
 		return nil, errors.New("unauthorized")
 	}
 	return claims, nil
+}
+
+// GetUserById Get User By ID
+func (s *userService) GetUserById(userId uint) (*models.PublicUser, error) {
+	user, err := s.userRepo.GetUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.PublicUser{
+		Id:        user.ID,
+		Name:      user.Name,
+		Username:  user.Username,
+		Image:     user.Image,
+		Bio:       user.Bio,
+		Onboarded: user.Onboarded,
+	}, nil
 }
