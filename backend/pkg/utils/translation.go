@@ -6,6 +6,8 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
+	"github.com/manjurulhoque/threadly/backend/internal/repositories"
+	"log/slog"
 	"os"
 	"reflect"
 	"strconv"
@@ -18,8 +20,14 @@ type IError struct {
 }
 
 var (
-	vl *validator.Validate
+	vl       *validator.Validate
+	userRepo repositories.UserRepository
 )
+
+// SetUserRepo sets the user repository
+func SetUserRepo(repo repositories.UserRepository) {
+	userRepo = repo
+}
 
 // TranslateError Translate errors
 func TranslateError(model interface{}) (errs []IError) {
@@ -38,7 +46,7 @@ func TranslateError(model interface{}) (errs []IError) {
 	})
 
 	_ = vl.RegisterTranslation("emailExists", trans, func(ut ut.Translator) error {
-		return ut.Add("emailExists", "{0} is already exists", true)
+		return ut.Add("emailExists", "Email is already taken", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("emailExists", fe.Field())
 		return t
@@ -51,12 +59,13 @@ func TranslateError(model interface{}) (errs []IError) {
 		return t
 	})
 
-	//if registerValidationError := vl.RegisterValidation("emailExists", func(fl validator.FieldLevel) bool {
-	//	_, exists := handlers.FindUserByEmail(fl.Field().String())
-	//	return !exists
-	//}); registerValidationError != nil {
-	//	fmt.Println("Error registering emailExists validation")
-	//}
+	if registerValidationError := vl.RegisterValidation("emailExists", func(fl validator.FieldLevel) bool {
+		exists := userRepo.FindUserByEmail(fl.Field().String())
+		slog.Info("Email exists", "exists", exists)
+		return !exists
+	}); registerValidationError != nil {
+		fmt.Println("Error registering emailExists validation")
+	}
 
 	if registerValidationError := vl.RegisterValidation("integer", func(fl validator.FieldLevel) bool {
 		value, err := strconv.Atoi(fl.Field().String())

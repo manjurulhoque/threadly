@@ -3,6 +3,8 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
+	"github.com/manjurulhoque/threadly/backend/pkg/utils"
+	"log/slog"
 	"net/http"
 )
 
@@ -17,10 +19,10 @@ func NewUserHandler(userService services.UserService) *UserHandler {
 // Register user handler
 func (h *UserHandler) Register(c *gin.Context) {
 	var input struct {
-		Name     string `json:"name" binding:"required"`
-		Username string `json:"username" binding:"required"`
-		Email    string `json:"email" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		Name     string `json:"name" validate:"required"`
+		Username string `json:"username" validate:"required"`
+		Email    string `json:"email" validate:"required,email,emailExists"`
+		Password string `json:"password" validate:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -28,19 +30,27 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
+	errs := utils.TranslateError(input)
+	if errs != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errs})
+		return
+	}
+
+	slog.Info("Input", "input", input)
+
 	if err := h.userService.RegisterUser(input.Username, input.Name, input.Email, input.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "user registered successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
 }
 
 // Login user handler
 func (h *UserHandler) Login(c *gin.Context) {
 	var input struct {
-		Email    string `json:"email" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		Email    string `json:"email" validate:"required"`
+		Password string `json:"password" validate:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -63,7 +73,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 // Refresh token handler
 func (h *UserHandler) Refresh(c *gin.Context) {
 	var input struct {
-		RefreshToken string `json:"refresh_token" binding:"required"`
+		RefreshToken string `json:"refresh_token" validate:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&input); err != nil {

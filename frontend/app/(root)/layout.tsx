@@ -7,6 +7,7 @@ import TopBar from "@/components/shared/Topbar";
 import LeftSidebar from "@/components/shared/LeftSidebar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import BottomBar from "@/components/shared/BottomBar";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -34,6 +35,7 @@ export default function RootLayout({children}: { children: React.ReactNode; }) {
         </main>
 
         <BottomBar/>
+        <Toaster/>
         </body>
         </html>
     );

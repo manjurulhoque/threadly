@@ -3,11 +3,13 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { usePathname, useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAddThreadMutation } from "@/store/threads/threadApi";
+import { toast, useToast } from "@/components/ui/use-toast";
 
 interface Props {
 }
@@ -27,14 +29,19 @@ const PostThread = (Props) => {
     });
 
     const onSubmit = async (values: z.infer<any>) => {
-        try {
-            await addThread({
-                content: values.content,
-            }).unwrap();
-            router.push("/");
-        } catch (error) {
-            console.error(error);
-        }
+        toast({
+            title: "Hello!",
+            description: "This is a custom toast notification.",
+        });
+        // try {
+        //     await addThread({
+        //         content: values.content,
+        //     }).unwrap();
+        //     router.push("/");
+        //     useToast()
+        // } catch (error) {
+        //     console.error(error);
+        // }
     };
 
     return (

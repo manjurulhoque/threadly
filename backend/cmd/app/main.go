@@ -11,6 +11,7 @@ import (
 	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/repositories"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
+	"github.com/manjurulhoque/threadly/backend/pkg/utils"
 	"log/slog"
 	"time"
 )
@@ -48,6 +49,9 @@ func main() {
 	threadHandler := handlers.NewThreadHandler(threadService)
 
 	router.Static("/uploads", "./uploads")
+
+	// Set the user repository in the utils package
+	utils.SetUserRepo(userRepo)
 
 	// Updated CORS configuration
 	router.Use(cors.New(cors.Config{
