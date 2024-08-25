@@ -13,7 +13,7 @@ import (
 
 // Define constants for token expiration
 const (
-	accessTokenExpiry  = time.Minute * 60
+	accessTokenExpiry  = time.Minute * 5
 	refreshTokenExpiry = time.Hour * 24 * 7
 )
 

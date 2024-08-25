@@ -16,14 +16,13 @@ export const metadata = {
     title: 'Profile',
 }
 
-async function Page({ params }: { params: { id: string } }) {
+async function Page({ params }: { params: { id: number } }) {
     const data: UserSession | null = await getServerSession(authOptions);
     const user = data?.user;
     if (!user) {
-        permanentRedirect('/');
+        permanentRedirect('/login');
     }
-    const userInfo = await fetchUser(user.id);
-    console.log(userInfo);
+    const userInfo = await fetchUser(params.id);
     // if (!userInfo?.onboarded) redirect("/onboarding");
 
     return (
@@ -60,7 +59,7 @@ async function Page({ params }: { params: { id: string } }) {
                         >
                             {/* @ts-ignore */}
                             <ThreadsTab
-                                userId={user.id}
+                                userId={params.id}
                             />
                         </TabsContent>
                     ))}

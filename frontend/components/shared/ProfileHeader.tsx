@@ -1,12 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { User } from "@/types/user.type";
+import { useSession } from "next-auth/react";
 
 interface Props {
     user: User;
 }
 
 function ProfileHeader({ user }: Props) {
+    const {data: session, status} = useSession();
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
     return (
@@ -41,18 +45,22 @@ function ProfileHeader({ user }: Props) {
                         <p className='text-base-medium text-gray-1'>@{user.username}</p>
                     </div>
                 </div>
-                <Link href='/profile/edit'>
-                    <div className='flex cursor-pointer gap-3 rounded-lg bg-dark-3 px-4 py-2'>
-                        <Image
-                            src='/assets/edit.svg'
-                            alt='logout'
-                            width={16}
-                            height={16}
-                            style={{ width: "auto" }}
-                        />
-                        <p className='text-light-2 max-sm:hidden'>Edit</p>
-                    </div>
-                </Link>
+                {
+                    session?.user?.id === user.id ? (
+                        <Link href='/profile/edit'>
+                            <div className='flex cursor-pointer gap-3 rounded-lg bg-dark-3 px-4 py-2'>
+                                <Image
+                                    src='/assets/edit.svg'
+                                    alt='logout'
+                                    width={16}
+                                    height={16}
+                                    style={{ width: "auto" }}
+                                />
+                                <p className='text-light-2 max-sm:hidden'>Edit</p>
+                            </div>
+                        </Link>
+                    ) : null
+                }
             </div>
 
             <p className='mt-6 max-w-lg text-base-regular text-light-2'>{user.bio}</p>
