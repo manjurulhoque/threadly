@@ -6,7 +6,13 @@ import { authOptions } from "@/lib/authOptions";
 
 export async function fetchUser(userId: number) {
     try {
-        const response = await fetch(`${process.env.BACKEND_BASE_URL}/api/users/${userId}`);
+        const data: UserSession | null = await getServerSession(authOptions);
+        const response = await fetch(`${process.env.BACKEND_BASE_URL}/api/users/${userId}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data?.access}`
+            }
+        });
         return await response.json();
     } catch (error: any) {
         throw new Error(`Failed to fetch user: ${error}`);
