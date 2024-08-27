@@ -15,6 +15,10 @@ function ProfileHeader({ user }: Props) {
     const { data: session, status } = useSession();
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
+    const followUser = () => {
+        console.log('Follow user');
+    };
+
     return (
         <div className='flex w-full flex-col justify-start'>
             <div className='flex items-center justify-between'>
@@ -68,9 +72,7 @@ function ProfileHeader({ user }: Props) {
                         session?.user?.id !== user.id ? (
                             <Button
                                 className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
-                                onClick={() => {
-                                    console.log("Follow user");
-                                }}
+                                onClick={() => followUser}
                             >
                                 <UserPlusIcon className="w-5 h-5"/>
                                 Follow
