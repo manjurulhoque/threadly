@@ -19,12 +19,12 @@ function ProfileHeader({ user }: Props) {
     const [followUser, {isLoading, isError, error}] = useFollowUserMutation(session?.user?.id);
 
     const onClickFollowUser = () => {
-        console.log('Follow user');
         followUser(user.id).unwrap().then(() => {
             console.log('User followed');
             toast.success("User followed successfully");
         }).catch((error) => {
             console.error('Failed to follow user:', error);
+            toast.error("Failed to follow user");
         });
     };
 

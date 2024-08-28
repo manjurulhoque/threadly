@@ -23,6 +23,14 @@ func FollowUser(c *gin.Context) {
 		return
 	}
 
+	// Check if the user is already followed
+	var existingFollow models.Follow
+	if err := db.DB.Where("follower_id = ? AND followee_id = ?", followerID, uint(id)).First(&existingFollow).Error; err == nil {
+		// Record exists, meaning the user is already followed
+		c.JSON(http.StatusConflict, gin.H{"error": "You are already following this user"})
+		return
+	}
+
 	// Create follow relationship
 	follow := models.Follow{
 		FollowerID: followerID.(uint),
