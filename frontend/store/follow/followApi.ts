@@ -1,6 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import DynamicBaseQuery from "@/store/dynamic-base-query";
 
+type IsFollowingResponse = { data: boolean };
+
 const followApi = createApi({
     reducerPath: "followApi",
     baseQuery: DynamicBaseQuery,
@@ -18,12 +20,17 @@ const followApi = createApi({
                 method: "DELETE",
             }),
         }),
+        isFollowing: builder.query<IsFollowingResponse, number>({
+            query: (userId) => `users/${userId}/is-following`,
+            providesTags: [ "Follow" ],
+        }),
     }),
 });
 
 export const {
     useFollowUserMutation,
     useUnfollowUserMutation,
+    useIsFollowingQuery
 } = followApi;
 
 export default followApi;
