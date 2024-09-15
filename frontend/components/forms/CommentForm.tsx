@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, } from "@/components
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { addCommentToThread } from "@/lib/actions/thread.actions";
 
 interface Props {
     threadId: number;
@@ -22,6 +23,8 @@ const CommentForm = ({threadId, currentUserImg}: Props) => {
     });
 
     const onSubmit = async (values: z.infer<any>) => {
+        await addCommentToThread(threadId, values.content);
+
         form.reset();
     };
 
@@ -32,7 +35,7 @@ const CommentForm = ({threadId, currentUserImg}: Props) => {
             <form className='comment-form' onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField
                     control={form.control}
-                    name='thread'
+                    name='content'
                     render={({field}) => (
                         <FormItem className='flex w-full items-center gap-3'>
                             <FormLabel>
