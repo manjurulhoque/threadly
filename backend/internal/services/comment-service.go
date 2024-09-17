@@ -7,7 +7,7 @@ import (
 
 type CommentService interface {
 	CreateComment(comment *models.Comment) error
-	CommentsByThreadId(threadId string) ([]models.Comment, error)
+	CommentsByThreadId(threadId string) ([]models.CommentResponse, error)
 }
 
 type commentService struct {
@@ -22,6 +22,6 @@ func (s *commentService) CreateComment(comment *models.Comment) error {
 	return s.commentRepo.CreateComment(comment)
 }
 
-func (s *commentService) CommentsByThreadId(threadId string) ([]models.Comment, error) {
+func (s *commentService) CommentsByThreadId(threadId string) ([]models.CommentResponse, error) {
 	return s.commentRepo.CommentsByThreadId(threadId)
 }

@@ -20,7 +20,7 @@ func (h *CommentHandler) CommentsByThreadId(c *gin.Context) {
 	threadId := c.Param("id")
 	comments, err := h.commentService.CommentsByThreadId(threadId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "comments": []models.Comment{}})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "comments": []models.CommentResponse{}})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"comments": comments})

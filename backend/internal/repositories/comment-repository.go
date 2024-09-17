@@ -7,7 +7,7 @@ import (
 
 type CommentRepository interface {
 	CreateComment(comment *models.Comment) error
-	CommentsByThreadId(threadId string) ([]models.Comment, error)
+	CommentsByThreadId(threadId string) ([]models.CommentResponse, error)
 }
 
 type commentRepository struct {
@@ -22,8 +22,8 @@ func (r *commentRepository) CreateComment(comment *models.Comment) error {
 	return r.db.Create(comment).Error
 }
 
-func (r *commentRepository) CommentsByThreadId(threadId string) ([]models.Comment, error) {
-	var comments []models.Comment
+func (r *commentRepository) CommentsByThreadId(threadId string) ([]models.CommentResponse, error) {
+	var comments []models.CommentResponse
 	err := r.db.Where("thread_id = ?", threadId).Find(&comments).Error
 	return comments, err
 }
