@@ -6,10 +6,12 @@ import httpStatus from "@/lib/http-status";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { signIn, SignInResponse } from "next-auth/react";
+import { Loader } from "lucide-react";
 
 const Login = () => {
     const [isClient, setIsClient] = useState(false);
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const {
         register,
         handleSubmit,
@@ -24,6 +26,7 @@ const Login = () => {
     if (!isClient) return null;
 
     const onSubmit = async (data) => {
+        setIsLoading(true);
         const result: SignInResponse | undefined = await signIn("credentials", {
             email: data.email,
             password: data.password,
@@ -39,6 +42,7 @@ const Login = () => {
                 window.location.reload();
             }, 500);
         }
+        setIsLoading(false);
     }
 
     return (
@@ -107,7 +111,11 @@ const Login = () => {
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                             >
-                                Login
+                                {isLoading ? (
+                                    <Loader className="animate-spin w-5 h-5 mr-2" />
+                                ) : (
+                                    <span>Login</span>
+                                )}
                             </button>
                         </div>
                     </form>
