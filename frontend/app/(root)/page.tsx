@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/authOptions";
 import { permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import HomeThreadList from "@/components/thread/HomeThreadList";
+import PostThread from "@/components/forms/PostThread";
 
 export const metadata: Metadata = {
     title: 'Home - Threadly',
@@ -19,6 +20,7 @@ const Page = async ({searchParams,}: { searchParams: { [key: string]: string | u
     return (
         <>
             <h1 className="head-text text-left">Home</h1>
+            <PostThread/>
 
             <HomeThreadList/>
         </>

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useAddThreadMutation } from "@/store/threads/threadApi";
 import { toast } from "react-toastify";
+import { Loader } from "lucide-react";
 
 interface Props {
 }
@@ -54,7 +55,7 @@ const PostThread = (Props) => {
     return (
         <Form {...form}>
             <form
-                className='mt-10 flex flex-col justify-start gap-10'
+                className='flex flex-col justify-start gap-3'
                 onSubmit={form.handleSubmit(onSubmit)}
             >
                 <FormField
@@ -65,16 +66,20 @@ const PostThread = (Props) => {
                             <FormLabel className='text-base-semibold text-light-2'>
                                 Content
                             </FormLabel>
-                            <FormControl className='no-focus border border-dark-4 bg-dark-3 text-light-1'>
-                                <Textarea rows={15} {...field} />
+                            <FormControl className='no-focus border border-dark-4 dark:bg-dark-3 dark:text-light-1'>
+                                <Textarea rows={5} {...field} />
                             </FormControl>
                             <FormMessage/>
                         </FormItem>
                     )}
                 />
 
-                <Button type='submit' className='bg-primary-500'>
-                    Post Thread
+                <Button type='submit' className='dark:bg-primary-500' disabled={isLoading}>
+                    {isLoading ? (
+                        <Loader className="animate-spin w-5 h-5 mr-2" />
+                    ) : (
+                        <span>Post Thread</span>
+                    )}
                 </Button>
             </form>
         </Form>

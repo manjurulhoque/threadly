@@ -23,13 +23,16 @@ function BottomBar() {
                             key={link.label}
                             className={`bottombar_link ${isActive && "bg-primary-500"}`}
                         >
-                            <Image
-                                src={link.imgURL}
-                                alt={link.label}
-                                width={16}
-                                height={16}
-                                className='object-contain'
-                            />
+                            <div className="invert-0 dark:invert brightness-0 dark:brightness-200">
+                                <Image
+                                    src={link.imgURL}
+                                    alt={link.label}
+                                    width={16}
+                                    height={16}
+                                    className='object-contain'
+                                    style={{ filter: "invert(1)" }}
+                                />
+                            </div>
 
                             <p className='text-subtle-medium text-light-1 max-sm:hidden'>
                                 {link.label.split(/\s+/)[0]}
