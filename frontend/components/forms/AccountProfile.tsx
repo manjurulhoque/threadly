@@ -14,15 +14,15 @@ const AccountProfile = ({user, btnTitle}) => {
     const { data: session, status } = useSession();
     const router = useRouter();
     const pathname = usePathname();
-
-    const [files, setFiles] = useState<File[]>([]);
-
     const [isMounted, setIsMounted] = useState(false);
+
+    let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
+    console.log(userImage);
 
     const form = useForm<any>({
         // resolver: zodResolver(UserValidation),
         defaultValues: {
-            profile_photo: user.image ?? "",
+            profile_photo: userImage,
             name: user.name ?? "",
             username: user.username ?? "",
             bio: user.bio ?? "",
@@ -55,7 +55,7 @@ const AccountProfile = ({user, btnTitle}) => {
 
     const handleImage = (
         e: ChangeEvent<HTMLInputElement>,
-        fieldChange: (value: string) => void
+        fieldChange: (value: File) => void
     ) => {
         e.preventDefault();
 
@@ -63,14 +63,17 @@ const AccountProfile = ({user, btnTitle}) => {
 
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
-            setFiles(Array.from(e.target.files));
+            // setFiles(Array.from(e.target.files));
 
             if (!file.type.includes("image")) return;
 
-            fileReader.onload = async (event) => {
-                const imageDataUrl = event.target?.result?.toString() || "";
-                fieldChange(imageDataUrl);
-            };
+            // fileReader.onload = async (event) => {
+            //     const imageDataUrl = event.target?.result?.toString() || "";
+            //     fieldChange(imageDataUrl);
+            // };
+
+            // Pass the file directly
+            fieldChange(file);
 
             fileReader.readAsDataURL(file);
         }

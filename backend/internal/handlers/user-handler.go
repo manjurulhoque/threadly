@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
 	"github.com/manjurulhoque/threadly/backend/pkg/utils"
 	"log/slog"
+	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -111,64 +112,66 @@ func (h *UserHandler) GetUserById(c *gin.Context) {
 }
 
 func (h *UserHandler) UpdateUserProfile(c *gin.Context) {
-	userId, exists := c.Get("userId")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-
 	var input struct {
-		Name     string `json:"name" validate:"required"`
-		Username string `json:"username" validate:"required"`
-		Bio      string `json:"bio"`
+		Name     string                `form:"name" validate:"required"`
+		Username string                `form:"username" validate:"required"`
+		Bio      string                `form:"bio" validate:"required"`
+		Image    *multipart.FileHeader `form:"image"`
 	}
 
-	// Log the raw JSON payload
-	var rawPayload map[string]interface{}
-	if err := c.ShouldBindJSON(&rawPayload); err != nil {
-		slog.Error("Error binding raw JSON", "error", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "status": false})
-		return
-	}
-	slog.Info("Raw JSON payload", "payload", rawPayload)
-
-	if err := c.ShouldBindJSON(&input); err != nil {
+	// Bind input
+	if err := c.ShouldBind(&input); err != nil {
 		slog.Error("Error binding JSON", "error", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "status": false})
 		return
 	}
 
+	// Validate input
 	errs := utils.TranslateError(input)
 	if errs != nil {
 		slog.Error("Validation error", "errors", errs)
 		c.JSON(http.StatusBadRequest, gin.H{"errors": errs, "status": false})
 		return
 	}
+	userId, _ := c.Get("userId")
 
-	var user models.User
-	user.ID = userId.(uint)
-	user.Name = input.Name
-	user.Username = input.Username
-	user.Bio = input.Bio
+	// Prepare updates
+	updates := map[string]interface{}{
+		"Name":     input.Name,
+		"Username": input.Username,
+		"Bio":      input.Bio,
+	}
 
 	// Handle file upload
-	file, _ := c.FormFile("image")
-	if file != nil {
-		// Generate a unique file name using uuid and keep the original extension
-		extension := filepath.Ext(file.Filename)                           // Get the file extension
-		newFileName := fmt.Sprintf("%s%s", uuid.New().String(), extension) // Generate UUID and append the file extension
+	if input.Image != nil {
+		// Define the path where files should be saved
+		uploadsPath := "./web/uploads"
 
-		// Define the path to save the file (e.g., "uploads/")
-		filePath := filepath.Join("web/uploads", newFileName)
-		if err := c.SaveUploadedFile(file, filePath); err != nil {
+		// Check if the uploads directory exists; create it if it doesn't
+		if _, err := os.Stat(uploadsPath); os.IsNotExist(err) {
+			err = os.MkdirAll(uploadsPath, os.ModePerm)
+			if err != nil {
+				slog.Error("Failed to create uploads directory", "error", err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create uploads directory"})
+				return
+			}
+		}
+		slog.Info("Uploads directory created", "Filename", input.Image.Filename)
+		extension := filepath.Ext(input.Image.Filename)
+		newFileName := fmt.Sprintf("%s%s", uuid.New().String(), extension)
+		filePath := filepath.Join(uploadsPath, newFileName)
+		slog.Info("File path", "path", filePath)
+
+		// Save the uploaded file
+		if err := c.SaveUploadedFile(input.Image, filePath); err != nil {
 			slog.Error("Error saving file", "error", err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "status": false})
 			return
 		}
-		user.Image = filePath
+		updates["Image"] = filePath
 	}
 
-	err := h.userService.UpdateUser(&user)
+	err := h.userService.UpdateUser(userId.(uint), updates)
 	if err != nil {
 		slog.Error("Error updating user profile", "error", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

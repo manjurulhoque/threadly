@@ -23,7 +23,7 @@ type UserService interface {
 	RefreshToken(refreshToken string) (string, error)         // Returns new access token
 	VerifyToken(token string) (*JWTCustomClaims, error)
 	GetUserById(userId uint) (*models.PublicUser, error)
-	UpdateUser(user *models.User) error
+	UpdateUser(uint, map[string]interface{}) error
 }
 
 var jwtSecret = []byte("ABC123")
@@ -179,6 +179,6 @@ func (s *userService) GetUserById(userId uint) (*models.PublicUser, error) {
 }
 
 // UpdateUser Update User
-func (s *userService) UpdateUser(user *models.User) error {
-	return s.userRepo.UpdateUser(user)
+func (s *userService) UpdateUser(userId uint, updates map[string]interface{}) error {
+	return s.userRepo.UpdateUser(userId, updates)
 }

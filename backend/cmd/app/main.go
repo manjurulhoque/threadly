@@ -48,7 +48,7 @@ func main() {
 	userHandler := handlers.NewUserHandler(userService)
 	threadHandler := handlers.NewThreadHandler(threadService)
 
-	router.Static("/uploads", "./uploads")
+	router.Static("/web/uploads", "./web/uploads")
 
 	// Set the user repository in the utils package
 	utils.SetUserRepo(userRepo)
