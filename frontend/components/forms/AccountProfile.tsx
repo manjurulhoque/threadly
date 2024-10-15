@@ -8,11 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { useSession } from "next-auth/react";
 
 const AccountProfile = ({user, btnTitle}) => {
+    const { data: session, status } = useSession();
     const router = useRouter();
     const pathname = usePathname();
-    // const { startUpload } = useUploadThing("media");
 
     const [files, setFiles] = useState<File[]>([]);
 
@@ -30,30 +31,26 @@ const AccountProfile = ({user, btnTitle}) => {
 
     const onSubmit = async (values: any) => {
         const blob = values.profile_photo;
+        const formData = new FormData();
+        if (blob) formData.append("image", blob);
+        formData.append("name", values.name);
+        formData.append("username", values.username);
+        formData.append("bio", values.bio);
 
-        // const hasImageChanged = isBase64Image(blob);
-        // if (hasImageChanged) {
-        //     const imgRes = await startUpload(files);
-        //
-        //     if (imgRes && imgRes[0].fileUrl) {
-        //         values.profile_photo = imgRes[0].fileUrl;
-        //     }
-        // }
-        //
-        // await updateUser({
-        //     name: values.name,
-        //     path: pathname,
-        //     username: values.username,
-        //     userId: user.id,
-        //     bio: values.bio,
-        //     image: values.profile_photo,
-        // });
-        //
-        // if (pathname === "/profile/edit") {
-        //     router.back();
-        // } else {
-        //     router.push("/");
-        // }
+        try {
+            const response = await fetch(`${process.env.BACKEND_BASE_URL}/api/users/update-profile`, {
+                method: "PUT",
+                body: formData,
+                headers: {
+                    "Authorization": `Bearer ${session?.access}`, // Add the Bearer token here
+                },
+            });
+            const data = await response.json();
+            console.log(data);
+            // router.back();
+        } catch (error: any) {
+            throw new Error(`Failed to update user: ${error}`);
+        }
     };
 
     const handleImage = (
@@ -78,6 +75,10 @@ const AccountProfile = ({user, btnTitle}) => {
             fileReader.readAsDataURL(file);
         }
     };
+
+    if (status === "loading") {
+        return <p>Loading...</p>;
+    }
 
     useEffect(() => {
         setIsMounted(true);
