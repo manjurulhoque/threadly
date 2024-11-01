@@ -1,6 +1,7 @@
+import type { Metadata } from "next";
 import Login from "@/components/auth/Login";
 
-export const metadata = {
+export const metadata: Metadata = {
     title: "Login",
     description: "Login to your account",
 }
