@@ -30,7 +30,7 @@ const Login = () => {
                     <form action="#" method="POST" className="space-y-6">
                         <div>
                             <label htmlFor="email" className="block text-sm/6 font-medium text-white">
-                                Email address
+                                Email
                             </label>
                             <div className="mt-2">
                                 <input
