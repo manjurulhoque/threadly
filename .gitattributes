@@ -1,0 +1,10 @@
+# Golang files (100% of the project)
+*.go        text eol=lf
+
+# Ignore TypeScript files in language statistics
+*.ts        linguist-detectable=false
+*.tsx       linguist-detectable=false
+
+# Ignore node_modules and vendor, as they contain dependencies
+/node_modules/* linguist-vendored
+/vendor/* linguist-vendored
