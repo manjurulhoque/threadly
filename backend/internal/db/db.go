@@ -1,19 +1,21 @@
-package config
+package db
 
 import (
 	"fmt"
+	"github.com/manjurulhoque/threadly/backend/internal/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"log/slog"
 )
 
 var DB *gorm.DB
 
 // InitializeDB creates a new GORM DB connection
 func InitializeDB() (*gorm.DB, error) {
-	config := GetDBConfig()
+	conf := config.GetDBConfig()
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		config.Host, config.User, config.Password, config.DBName, config.Port, config.SSLMode)
+		conf.Host, conf.User, conf.Password, conf.DBName, conf.Port, conf.SSLMode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
@@ -29,8 +31,10 @@ func InitializeDB() (*gorm.DB, error) {
 func CloseDB(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {
-		fmt.Println("Failed to get DB connection")
+		slog.Error("Failed to get DB connection", "error", err.Error())
 		return
 	}
-	sqlDB.Close()
+	if err := sqlDB.Close(); err != nil {
+		slog.Error("Failed to close DB connection", "error", err.Error())
+	}
 }

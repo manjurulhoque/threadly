@@ -1,9 +1,12 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/manjurulhoque/threadly/backend/config"
+	"github.com/manjurulhoque/threadly/backend/internal/config"
+	"github.com/manjurulhoque/threadly/backend/internal/db"
 	"log/slog"
+	"time"
 )
 
 func init() {
@@ -11,7 +14,7 @@ func init() {
 	config.LoadConfig()
 
 	// initialize the database
-	_, err := config.InitializeDB()
+	_, err := db.InitializeDB()
 	if err != nil {
 		slog.Error("Failed to initialize database", "error", err.Error())
 		panic(err)
@@ -21,14 +24,19 @@ func init() {
 func main() {
 	// create a new gin server and run it
 	router := gin.Default()
-	defer config.CloseDB(config.DB)
+	defer db.CloseDB(db.DB)
 
-	// add a route to the server
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	router.Static("/uploads", "./uploads")
+
+	// Updated CORS configuration
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	// run the server
 	err := router.Run()
