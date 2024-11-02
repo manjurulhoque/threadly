@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/config"
 	"github.com/manjurulhoque/threadly/backend/internal/db"
+	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"log/slog"
 	"time"
 )
@@ -18,6 +20,12 @@ func init() {
 	if err != nil {
 		slog.Error("Failed to initialize database", "error", err.Error())
 		panic(err)
+	}
+
+	err = db.DB.AutoMigrate(&models.User{})
+	if err != nil {
+		slog.Error("Error migrating database", "error", err.Error())
+		panic(fmt.Sprintf("Error migrating database: %v", err))
 	}
 }
 
