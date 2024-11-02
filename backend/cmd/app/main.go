@@ -6,7 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/config"
 	"github.com/manjurulhoque/threadly/backend/internal/db"
+	"github.com/manjurulhoque/threadly/backend/internal/handlers"
 	"github.com/manjurulhoque/threadly/backend/internal/models"
+	"github.com/manjurulhoque/threadly/backend/internal/repositories"
+	"github.com/manjurulhoque/threadly/backend/internal/services"
 	"log/slog"
 	"time"
 )
@@ -34,6 +37,12 @@ func main() {
 	router := gin.Default()
 	defer db.CloseDB(db.DB)
 
+	userRepo := repositories.NewUserRepository(db.DB)
+
+	userService := services.NewUserService(userRepo)
+
+	userHandler := handlers.NewUserHandler(userService)
+
 	router.Static("/uploads", "./uploads")
 
 	// Updated CORS configuration
@@ -45,6 +54,13 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	api := router.Group("/api")
+	{
+		api.POST("/register", userHandler.Register)
+		api.POST("/login", userHandler.Login)
+		api.POST("/token/refresh", userHandler.Refresh)
+	}
 
 	// run the server
 	err := router.Run()
