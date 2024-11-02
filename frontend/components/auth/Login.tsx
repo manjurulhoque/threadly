@@ -2,15 +2,44 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import httpStatus from "@/lib/http-status";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { signIn, SignInResponse } from "next-auth/react";
 
 const Login = () => {
     const [isClient, setIsClient] = useState(false);
+    const [message, setMessage] = useState("");
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: {errors},
+    } = useForm();
 
     useEffect(() => {
         setIsClient(true);
     }, []);
 
     if (!isClient) return null;
+
+    const onSubmit = async (data) => {
+        const result: SignInResponse | undefined = await signIn("credentials", {
+            email: data.email,
+            password: data.password,
+            redirect: false,
+        });
+
+        if (result?.status === httpStatus.UNAUTHORIZED) {
+            // If there is an error, update the state to display the error message
+            setMessage("Invalid credentials");
+        } else {
+            toast.success("Logged in successfully");
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }
+    }
 
     return (
         <>
@@ -34,6 +63,7 @@ const Login = () => {
                             </label>
                             <div className="mt-2">
                                 <input
+                                    {...register("email", {required: true})}
                                     id="email"
                                     name="email"
                                     type="email"
@@ -57,6 +87,7 @@ const Login = () => {
                             </div>
                             <div className="mt-2">
                                 <input
+                                    {...register("password", {required: true})}
                                     id="password"
                                     name="password"
                                     type="password"
@@ -67,12 +98,16 @@ const Login = () => {
                             </div>
                         </div>
 
+                        {
+                            message && <p className='text-red-500 text-xs italic mb-3'>{message}</p>
+                        }
+
                         <div>
                             <button
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                             >
-                                Register
+                                Login
                             </button>
                         </div>
                     </form>
