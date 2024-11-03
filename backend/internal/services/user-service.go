@@ -12,7 +12,7 @@ import (
 )
 
 type UserService interface {
-	RegisterUser(username, email, password string) error
+	RegisterUser(username, name, email, password string) error
 	LoginUser(email, password string) (string, string, error) // Returns access and refresh tokens
 	RefreshToken(refreshToken string) (string, error)         // Returns new access token
 	VerifyToken(token string) (*JWTCustomClaims, error)
@@ -48,13 +48,14 @@ func checkPasswordHash(password, hash string) bool {
 }
 
 // RegisterUser Register User
-func (s *userService) RegisterUser(name, email, password string) error {
+func (s *userService) RegisterUser(username, name, email, password string) error {
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
 		return err
 	}
 
 	user := &models.User{
+		Username: username,
 		Name:     name,
 		Email:    email,
 		Password: hashedPassword,

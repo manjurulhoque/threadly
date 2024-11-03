@@ -18,6 +18,7 @@ func NewUserHandler(userService services.UserService) *UserHandler {
 func (h *UserHandler) Register(c *gin.Context) {
 	var input struct {
 		Name     string `json:"name" binding:"required"`
+		Username string `json:"username" binding:"required"`
 		Email    string `json:"email" binding:"required"`
 		Password string `json:"password" binding:"required"`
 	}
@@ -27,7 +28,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	if err := h.userService.RegisterUser(input.Name, input.Email, input.Password); err != nil {
+	if err := h.userService.RegisterUser(input.Username, input.Name, input.Email, input.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
