@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
-    userId: string;
+    userId: number;
 }
 
-function PostThread({userId}: Props) {
+const PostThread = ({userId}: Props) => {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -21,8 +21,7 @@ function PostThread({userId}: Props) {
     const form = useForm < z.infer<any>>({
         // resolver: zodResolver(ThreadValidation),
         defaultValues: {
-            thread: "",
-            accountId: userId,
+            content: "",
         },
     });
 
