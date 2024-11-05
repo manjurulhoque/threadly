@@ -1,4 +1,4 @@
-import { createApi } from "@reduxjs/toolkit/query";
+import { createApi } from '@reduxjs/toolkit/query/react';
 import DynamicBaseQuery from "@/store/dynamic-base-query";
 import { Thread } from "@/types/thread.type";
 
@@ -13,24 +13,11 @@ const threadApi = createApi({
         getThread: builder.query<Thread, number>({
             query: (id) => `threads/${id}`,
         }),
-        addThread: builder.mutation<Thread, Omit<Thread, "id">>({
+        addThread: builder.mutation<void, void>({
             query: (thread) => ({
                 url: "threads",
                 method: "POST",
                 body: thread,
-            }),
-        }),
-        updateThread: builder.mutation<Thread, Thread>({
-            query: (thread) => ({
-                url: `threads/${thread.id}`,
-                method: "PUT",
-                body: thread,
-            }),
-        }),
-        deleteThread: builder.mutation<void, number>({
-            query: (id) => ({
-                url: `threads/${id}`,
-                method: "DELETE",
             }),
         }),
     }),

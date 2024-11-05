@@ -8,6 +8,10 @@ import LeftSidebar from "@/components/shared/LeftSidebar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import BottomBar from "@/components/shared/BottomBar";
 import { Toaster } from "@/components/ui/toaster";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import { NextAuthProvider } from "@/components/NextAuthProvider";
+import ReduxProvider from "@/components/ReduxProvider";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -19,24 +23,30 @@ export const metadata: Metadata = {
     description: '',
 }
 
-export default function RootLayout({children}: { children: React.ReactNode; }) {
+export default async function RootLayout({children}: { children: React.ReactNode; }) {
+    const session = await getServerSession(authOptions);
+
     return (
-        <html lang='en'>
-        <body className={inter.className}>
-        <TopBar/>
+        <NextAuthProvider session={session}>
+            <html lang='en'>
+            <body className={inter.className}>
+            <ReduxProvider>
+                <TopBar/>
 
-        <main className='flex flex-row'>
-            <LeftSidebar/>
-            <section className='main-container'>
-                <div className='w-full max-w-4xl'>{children}</div>
-            </section>
-            {/* @ts-ignore */}
-            <RightSidebar/>
-        </main>
+                <main className='flex flex-row'>
+                    <LeftSidebar/>
+                    <section className='main-container'>
+                        <div className='w-full max-w-4xl'>{children}</div>
+                    </section>
+                    {/* @ts-ignore */}
+                    <RightSidebar/>
+                </main>
 
-        <BottomBar/>
-        <Toaster/>
-        </body>
-        </html>
+                <BottomBar/>
+                <Toaster/>
+            </ReduxProvider>
+            </body>
+            </html>
+        </NextAuthProvider>
     );
 }

@@ -3,23 +3,22 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { usePathname, useRouter } from "next/navigation";
-import Swal from "sweetalert2";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
 import { useAddThreadMutation } from "@/store/threads/threadApi";
-import { toast, useToast } from "@/components/ui/use-toast";
 
 interface Props {
 }
 
 const PostThread = (Props) => {
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
-    const [addThread, {isLoading, error}] = useAddThreadMutation();
-
-    // const { organization } = useOrganization();
+    const [addThread, {isLoading, isError, error}] = useAddThreadMutation();
 
     const form = useForm<z.infer<any>>({
         // resolver: zodResolver(ThreadValidation),
@@ -27,6 +26,15 @@ const PostThread = (Props) => {
             content: "",
         },
     });
+
+    // Ensure the component is only rendered after it's mounted on the client
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return null; // Avoid rendering anything during SSR
+    }
 
     const onSubmit = async (values: z.infer<any>) => {
         toast({
