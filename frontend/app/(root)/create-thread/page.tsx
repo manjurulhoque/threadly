@@ -18,7 +18,7 @@ const Page = async () => {
         <>
             <h1 className='head-text'>Create Thread</h1>
 
-            <PostThread userId={data.user.id}/>
+            <PostThread/>
         </>
     );
 };

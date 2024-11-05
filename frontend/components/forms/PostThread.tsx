@@ -7,18 +7,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useAddThreadMutation } from "@/store/threads/threadApi";
 
 interface Props {
-    userId: number;
 }
 
-const PostThread = ({userId}: Props) => {
+const PostThread = (Props) => {
     const router = useRouter();
     const pathname = usePathname();
+    const [addThread, {isLoading, error}] = useAddThreadMutation();
 
     // const { organization } = useOrganization();
 
-    const form = useForm < z.infer<any>>({
+    const form = useForm<z.infer<any>>({
         // resolver: zodResolver(ThreadValidation),
         defaultValues: {
             content: "",
@@ -26,8 +27,14 @@ const PostThread = ({userId}: Props) => {
     });
 
     const onSubmit = async (values: z.infer<any>) => {
-
-        router.push("/");
+        try {
+            await addThread({
+                content: values.content,
+            }).unwrap();
+            router.push("/");
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (

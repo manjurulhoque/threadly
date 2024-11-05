@@ -40,8 +40,6 @@ export const {
     useGetThreadsQuery,
     useGetThreadQuery,
     useAddThreadMutation,
-    useUpdateThreadMutation,
-    useDeleteThreadMutation,
 } = threadApi;
 
 export default threadApi;
