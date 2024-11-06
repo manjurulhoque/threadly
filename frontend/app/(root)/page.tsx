@@ -2,6 +2,12 @@ import { UserSession } from "@/types/user-session.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { permanentRedirect } from "next/navigation";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: 'Home',
+    description: '',
+}
 
 const Page = async ({searchParams,}: { searchParams: { [key: string]: string | undefined } }) => {
     const data: UserSession | null = await getServerSession(authOptions);

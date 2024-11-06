@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { sidebarLinks } from "@/constants";
+import { signOut } from "next-auth/react";
 
 const LeftSidebar = () => {
     const router = useRouter();
@@ -42,7 +43,7 @@ const LeftSidebar = () => {
             </div>
 
             <div className='mt-10 px-6'>
-                <div className='flex cursor-pointer gap-4 p-4'>
+                <div className='flex cursor-pointer gap-4 p-4' onClick={signOut}>
                     <Image
                         src='/assets/logout.svg'
                         alt='logout'
