@@ -6,6 +6,7 @@ import (
 	"github.com/manjurulhoque/threadly/backend/pkg/utils"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
 
 type UserHandler struct {
@@ -88,4 +89,19 @@ func (h *UserHandler) Refresh(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
+}
+
+func (h *UserHandler) GetUserById(c *gin.Context) {
+	userId := c.Param("id")
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user id"})
+		return
+	}
+	user, err := h.userService.GetUserById(uint(userIdInt))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
