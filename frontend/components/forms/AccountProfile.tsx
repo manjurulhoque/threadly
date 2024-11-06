@@ -16,15 +16,15 @@ const AccountProfile = ({user, btnTitle}) => {
 
     const [files, setFiles] = useState<File[]>([]);
 
-    const [isClient, setIsClient] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     const form = useForm<any>({
         // resolver: zodResolver(UserValidation),
         defaultValues: {
-            profile_photo: user?.image ? user.image : "",
-            name: user?.name ? user.name : "",
-            username: user?.username ? user.username : "",
-            bio: user?.bio ? user.bio : "",
+            profile_photo: user.image ?? "",
+            name: user.name ?? "",
+            username: user.username ?? "",
+            bio: user.bio ?? "",
         },
     });
 
@@ -80,10 +80,10 @@ const AccountProfile = ({user, btnTitle}) => {
     };
 
     useEffect(() => {
-        setIsClient(true);
+        setIsMounted(true);
     }, []);
 
-    if (!isClient) return null;
+    if (!isMounted) return null;
 
     return (
         <Form {...form}>
