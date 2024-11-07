@@ -5,13 +5,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { sidebarLinks } from "@/constants";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const LeftSidebar = () => {
     const router = useRouter();
     const pathname = usePathname();
+    const {data: session, status} = useSession();
 
-    const userId = 1;
+    const userId = session?.user.id;
 
     return (
         <section className='custom-scrollbar leftsidebar'>
