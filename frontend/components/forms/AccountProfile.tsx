@@ -17,7 +17,6 @@ const AccountProfile = ({user, btnTitle}) => {
     const [isMounted, setIsMounted] = useState(false);
 
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
-    console.log(userImage);
 
     const form = useForm<any>({
         // resolver: zodResolver(UserValidation),

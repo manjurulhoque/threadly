@@ -10,6 +10,8 @@ function ThreadCard({thread}: Props) {
     let isComment = false;
     let {id, content, parentId, createdAt, user} = thread;
 
+    let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
+
     return (
         <article
             className={`flex w-full flex-col rounded-xl ${
@@ -21,7 +23,7 @@ function ThreadCard({thread}: Props) {
                     <div className='flex flex-col items-center'>
                         <Link href={`/profile/${user.id}`} className='relative h-11 w-11'>
                             {
-                                user.image === "" ? (
+                                userImage === "" ? (
                                     <div
                                         className="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
                                         <svg className="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor"
@@ -32,9 +34,10 @@ function ThreadCard({thread}: Props) {
                                         </svg>
                                     </div>
                                 ) : <Image
-                                    src={user.image}
+                                    src={userImage}
                                     alt='user_image'
                                     fill
+                                    sizes={"10"}
                                     className='cursor-pointer rounded-full'
                                 />
                             }
