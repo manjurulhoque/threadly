@@ -31,13 +31,15 @@ const LeftSidebar = () => {
                                 isActive ? "bg-primary-500" : ""
                             }`}
                         >
-                            <Image
-                                src={link.imgURL}
-                                alt={link.label}
-                                width={24}
-                                height={24}
-                                className="dark:invert-[0.95] dark:brightness-200"
-                            />
+                            <div className="invert-0 dark:invert brightness-0 dark:brightness-200">
+                                <Image
+                                    src={link.imgURL}
+                                    alt={link.label}
+                                    width={24}
+                                    height={24}
+                                    className="dark:invert-[0.95] dark:brightness-200"
+                                />
+                            </div>
 
                             <p className='text-dark-2 dark:text-light-1 max-lg:hidden'>
                                 {link.label}
@@ -52,13 +54,15 @@ const LeftSidebar = () => {
                     className='flex cursor-pointer gap-4 p-4 hover:bg-light-3 dark:hover:bg-dark-3 rounded-lg'
                     onClick={signOut}
                 >
-                    <Image
-                        src='/assets/logout.svg'
-                        alt='logout'
-                        width={24}
-                        height={24}
-                        className="dark:invert-[0.95] dark:brightness-200"
-                    />
+                    <div className="invert-0 dark:invert brightness-0 dark:brightness-200">
+                        <Image
+                            src='/assets/logout.svg'
+                            alt='logout'
+                            width={24}
+                            height={24}
+                            style={{ filter: "invert(1)" }}
+                        />
+                    </div>
 
                     <p className='text-dark-2 dark:text-light-2 max-lg:hidden'>
                         Logout
