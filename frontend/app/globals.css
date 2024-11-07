@@ -5,27 +5,27 @@
 @layer components {
     /* main */
     .main-container {
-        @apply flex min-h-screen flex-1 flex-col items-center bg-dark-1 px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
+        @apply flex min-h-screen flex-1 flex-col items-center bg-light-2 dark:bg-dark-1 px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
     }
 
     /* Head Text */
     .head-text {
-        @apply text-heading2-bold text-light-1;
+        @apply text-heading2-bold text-dark-1 dark:text-light-1;
     }
 
     /* Activity */
     .activity-card {
-        @apply flex items-center gap-2 rounded-md bg-dark-2 px-7 py-4;
+        @apply flex items-center gap-2 rounded-md bg-light-3 dark:bg-dark-2 px-7 py-4;
     }
 
     /* No Result */
     .no-result {
-        @apply text-center !text-base-regular text-light-3;
+        @apply text-center !text-base-regular text-dark-3 dark:text-light-3;
     }
 
     /* Community Card */
     .community-card {
-        @apply w-full rounded-lg bg-dark-3 px-4 py-5 sm:w-96;
+        @apply w-full rounded-lg bg-light-2 dark:bg-dark-3 px-4 py-5 sm:w-96;
     }
 
     .community-card_btn {
@@ -34,12 +34,12 @@
 
     /* thread card  */
     .thread-card_bar {
-        @apply relative mt-2 w-0.5 grow rounded-full bg-neutral-800;
+        @apply relative mt-2 w-0.5 grow rounded-full bg-light-4 dark:bg-neutral-800;
     }
 
     /* User card */
     .user-card {
-        @apply flex flex-col justify-between gap-4 max-xs:rounded-xl max-xs:bg-dark-3 max-xs:p-4 xs:flex-row xs:items-center;
+        @apply flex flex-col justify-between gap-4 max-xs:rounded-xl max-xs:bg-light-2 max-xs:dark:bg-dark-3 max-xs:p-4 xs:flex-row xs:items-center;
     }
 
     .user-card_avatar {
@@ -51,19 +51,19 @@
     }
 
     .searchbar {
-        @apply flex gap-1 rounded-lg bg-dark-3 px-4 py-2;
+        @apply flex gap-1 rounded-lg bg-light-3 dark:bg-dark-3 px-4 py-2;
     }
 
     .searchbar_input {
-        @apply border-none bg-dark-3 text-base-regular text-light-4 outline-none !important;
+        @apply border-none bg-light-3 dark:bg-dark-3 text-base-regular text-dark-1 dark:text-light-4 outline-none !important;
     }
 
     .topbar {
-        @apply fixed top-0 z-30 flex w-full items-center justify-between bg-dark-2 px-6 py-3;
+        @apply fixed top-0 z-30 flex w-full items-center justify-between bg-light-2 dark:bg-dark-2 px-6 py-3;
     }
 
     .bottombar {
-        @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-glassmorphism p-4 backdrop-blur-lg xs:px-7 md:hidden;
+        @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-light-2 dark:bg-glassmorphism p-4 backdrop-blur-lg xs:px-7 md:hidden;
     }
 
     .bottombar_container {
@@ -75,7 +75,7 @@
     }
 
     .leftsidebar {
-        @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-r border-r-dark-4 bg-dark-2 pb-5 pt-28 max-md:hidden;
+        @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-r border-r-light-4 dark:border-r-dark-4 bg-light-2 dark:bg-dark-2 pb-5 pt-28 max-md:hidden;
     }
 
     .leftsidebar_link {
@@ -87,15 +87,11 @@
     }
 
     .rightsidebar {
-        @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-l-dark-4 bg-dark-2 px-10 pb-6 pt-28 max-xl:hidden;
+        @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-l-light-4 dark:border-l-dark-4 bg-light-2 dark:bg-dark-2 px-10 pb-6 pt-28 max-xl:hidden;
     }
 }
 
 @layer utilities {
-    .bg-dark-1 {
-        background-color: #000000;
-    }
-
     .css-invert {
         @apply invert-[50%] brightness-200;
     }
@@ -107,35 +103,24 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-track {
-        background: #09090a;
+        @apply bg-light-3 dark:bg-dark-3;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #5c5c7b;
+        @apply bg-light-4 dark:bg-dark-4;
         border-radius: 50px;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #7878a3;
+        @apply bg-light-3 dark:bg-dark-3;
     }
-}
-
-/* Clerk Responsive fix */
-.cl-organizationSwitcherTrigger .cl-userPreview .cl-userPreviewTextContainer {
-    @apply max-sm:hidden;
-}
-
-.cl-organizationSwitcherTrigger
-.cl-organizationPreview
-.cl-organizationPreviewTextContainer {
-    @apply max-sm:hidden;
 }
 
 /* Shadcn Component Styles */
 
 /* Tab */
 .tab {
-    @apply flex min-h-[50px] flex-1 items-center gap-3 bg-dark-2 text-light-2 data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-2 !important;
+    @apply flex min-h-[50px] flex-1 items-center gap-3 bg-light-2 dark:bg-dark-2 text-dark-1 dark:text-light-2 data-[state=active]:bg-light-3 dark:data-[state=active]:bg-[#0e0e12] data-[state=active]:text-dark-1 dark:data-[state=active]:text-light-2 !important;
 }
 
 .no-focus {
@@ -144,7 +129,7 @@
 
 /* Account Profile  */
 .account-form_image-label {
-    @apply flex h-24 w-24 items-center justify-center rounded-full bg-dark-4 !important;
+    @apply flex h-24 w-24 items-center justify-center rounded-full bg-light-3 dark:bg-dark-4 !important;
 }
 
 .account-form_image-input {
@@ -152,12 +137,12 @@
 }
 
 .account-form_input {
-    @apply border border-dark-4 bg-dark-3 text-light-1 !important;
+    @apply border border-light-4 dark:border-dark-4 bg-light-2 dark:bg-dark-3 text-dark-1 dark:text-light-1 !important;
 }
 
 /* Comment Form */
 .comment-form {
-    @apply mt-10 flex items-center gap-4 border-y border-y-dark-4 py-5 max-xs:flex-col !important;
+    @apply mt-10 flex items-center gap-4 border-y border-y-light-4 dark:border-y-dark-4 py-5 max-xs:flex-col !important;
 }
 
 .comment-form_btn {

@@ -13,6 +13,7 @@ import { NextAuthProvider } from "@/components/NextAuthProvider";
 import ReduxProvider from "@/components/ReduxProvider";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -29,23 +30,31 @@ export default async function RootLayout({children}: { children: React.ReactNode
 
     return (
         <NextAuthProvider session={session}>
-            <html lang='en'>
-            <body className={inter.className}>
-            <ReduxProvider>
-                <TopBar/>
+            <html lang='en' suppressHydrationWarning>
+            <body className={`${inter.className} bg-light-2 dark:bg-dark-2`}>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                storageKey="threadly-theme"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <ReduxProvider>
+                    <TopBar/>
 
-                <main className='flex flex-row'>
-                    <LeftSidebar/>
-                    <section className='main-container'>
-                        <div className='w-full max-w-4xl'>{children}</div>
-                    </section>
-                    {/* @ts-ignore */}
-                    <RightSidebar/>
-                </main>
+                    <main className='flex flex-row'>
+                        <LeftSidebar/>
+                        <section className='main-container'>
+                            <div className='w-full max-w-4xl'>{children}</div>
+                        </section>
+                        {/* @ts-ignore */}
+                        <RightSidebar/>
+                    </main>
 
-                <BottomBar/>
-                <ToastContainer />
-            </ReduxProvider>
+                    <BottomBar/>
+                    <ToastContainer/>
+                </ReduxProvider>
+            </ThemeProvider>
             </body>
             </html>
         </NextAuthProvider>

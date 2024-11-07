@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ModeToggle } from "@/components/shared/ModeToggle";
 
 function TopBar() {
     return (
@@ -9,7 +10,9 @@ function TopBar() {
                 <p className='text-heading3-bold text-light-1 max-xs:hidden'>Threads</p>
             </Link>
 
-            <div className='flex items-center gap-1'>
+            <div className='flex items-center gap-2'>
+                <ModeToggle />
+
                 <div className='block md:hidden'>
                     <div className='flex cursor-pointer'>
                         <Image
