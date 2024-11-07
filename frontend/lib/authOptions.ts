@@ -83,6 +83,10 @@ export const authOptions: AuthOptions = {
             return token;
         },
         async session({session, token, user}) {
+            const currentTime = Math.floor(Date.now() / 1000);
+            if (token.exp && token.exp < currentTime) {
+                return null; // Token expired, return null to force sign out
+            }
             session.access = token.access;
             session.exp = token.exp;
             session.refresh = token.refresh;
