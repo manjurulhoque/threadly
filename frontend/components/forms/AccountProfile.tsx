@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useSession } from "next-auth/react";
+import { Loader } from "lucide-react";
 
 const AccountProfile = ({user, btnTitle}) => {
     const { data: session, status } = useSession();
     const router = useRouter();
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
@@ -29,6 +31,7 @@ const AccountProfile = ({user, btnTitle}) => {
     });
 
     const onSubmit = async (values: any) => {
+        setIsSubmitting(true);
         const blob = values.profile_photo;
         const formData = new FormData();
         if (blob && blob instanceof File) formData.append("image", blob);
@@ -50,6 +53,7 @@ const AccountProfile = ({user, btnTitle}) => {
         } catch (error: any) {
             throw new Error(`Failed to update user: ${error}`);
         }
+        setIsSubmitting(false);
     };
 
     const handleImage = (
@@ -193,7 +197,11 @@ const AccountProfile = ({user, btnTitle}) => {
                 />
 
                 <Button type='submit' className='dark:bg-primary-500'>
-                    {btnTitle}
+                    {isSubmitting ? (
+                        <Loader className="animate-spin w-5 h-5 mr-2" />
+                    ) : (
+                        <span>{btnTitle}</span>
+                    )}
                 </Button>
             </form>
         </Form>
