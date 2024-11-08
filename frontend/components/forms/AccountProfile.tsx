@@ -91,7 +91,7 @@ const AccountProfile = ({user, btnTitle}) => {
     return (
         <Form {...form}>
             <form
-                className='flex flex-col justify-start gap-10'
+                className='flex flex-col justify-start gap-4'
                 onSubmit={form.handleSubmit(onSubmit)}
             >
                 <FormField
@@ -119,7 +119,7 @@ const AccountProfile = ({user, btnTitle}) => {
                                     />
                                 )}
                             </FormLabel>
-                            <FormControl className='flex-1 text-base-semibold text-gray-200'>
+                            <FormControl className='flex-1 text-base-semibold dark:text-gray-200'>
                                 <Input
                                     type='file'
                                     accept='image/*'
@@ -136,8 +136,8 @@ const AccountProfile = ({user, btnTitle}) => {
                     control={form.control}
                     name='name'
                     render={({field}) => (
-                        <FormItem className='flex w-full flex-col gap-3'>
-                            <FormLabel className='text-base-semibold text-light-2'>
+                        <FormItem className='flex w-full flex-col gap-2'>
+                            <FormLabel className='text-base-semibold dark:text-light-2'>
                                 Name
                             </FormLabel>
                             <FormControl>
@@ -156,8 +156,8 @@ const AccountProfile = ({user, btnTitle}) => {
                     control={form.control}
                     name='username'
                     render={({field}) => (
-                        <FormItem className='flex w-full flex-col gap-3'>
-                            <FormLabel className='text-base-semibold text-light-2'>
+                        <FormItem className='flex w-full flex-col gap-2'>
+                            <FormLabel className='text-base-semibold dark:text-light-2'>
                                 Username
                             </FormLabel>
                             <FormControl>
@@ -176,8 +176,8 @@ const AccountProfile = ({user, btnTitle}) => {
                     control={form.control}
                     name='bio'
                     render={({field}) => (
-                        <FormItem className='flex w-full flex-col gap-3'>
-                            <FormLabel className='text-base-semibold text-light-2'>
+                        <FormItem className='flex w-full flex-col gap-1'>
+                            <FormLabel className='text-base-semibold dark:text-light-2'>
                                 Bio
                             </FormLabel>
                             <FormControl>
@@ -192,7 +192,7 @@ const AccountProfile = ({user, btnTitle}) => {
                     )}
                 />
 
-                <Button type='submit' className='bg-primary-500'>
+                <Button type='submit' className='dark:bg-primary-500'>
                     {btnTitle}
                 </Button>
             </form>
