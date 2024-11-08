@@ -196,13 +196,15 @@ const AccountProfile = ({user, btnTitle}) => {
                     )}
                 />
 
-                <Button type='submit' className='dark:bg-primary-500'>
-                    {isSubmitting ? (
-                        <Loader className="animate-spin w-5 h-5 mr-2" />
-                    ) : (
-                        <span>{btnTitle}</span>
-                    )}
-                </Button>
+                <div className="flex justify-end">
+                    <Button type='submit' className='dark:bg-primary-500 w-32' disabled={isSubmitting}>
+                        {isSubmitting ? (
+                            <Loader className="animate-spin w-5 h-5 mr-2" />
+                        ) : (
+                            <span>{btnTitle}</span>
+                        )}
+                    </Button>
+                </div>
             </form>
         </Form>
     );
