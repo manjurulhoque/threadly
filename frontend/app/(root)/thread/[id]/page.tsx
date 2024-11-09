@@ -6,6 +6,7 @@ import { permanentRedirect } from "next/navigation";
 import { fetchUser } from "@/lib/actions/user.actions";
 import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThread } from "@/lib/actions/thread.actions";
+import CommentForm from "@/components/forms/CommentForm";
 
 export const metadata = {
     title: "Thread",
@@ -38,11 +39,10 @@ const Page: React.FC<Props> = async ({params: {id}}) => {
             </div>
 
             <div className='mt-7'>
-                {/*<Comment*/}
-                {/*    threadId={params.id}*/}
-                {/*    currentUserImg={user.imageUrl}*/}
-                {/*    currentUserId={JSON.stringify(userInfo._id)}*/}
-                {/*/>*/}
+                <CommentForm
+                    threadId={Number(id)}
+                    currentUserImg={userInfo.data.image}
+                />
             </div>
 
             <div className='mt-10'>
