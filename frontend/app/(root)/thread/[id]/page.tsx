@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { permanentRedirect } from "next/navigation";
 import { fetchUser } from "@/lib/actions/user.actions";
+import ThreadCard from "@/components/cards/ThreadCard";
+import { fetchThread } from "@/lib/actions/thread.actions";
 
 export const metadata = {
     title: "Thread",
@@ -27,11 +29,25 @@ const Page: React.FC<Props> = async ({params: {id}}) => {
     if (!userInfo?.data) {
         permanentRedirect('/');
     }
+    const {thread} = await fetchThread(Number(id));
 
     return (
-        <div>
-            <h1>Thread</h1>
-        </div>
+        <section className='relative'>
+            <div>
+                <ThreadCard thread={thread}/>
+            </div>
+
+            <div className='mt-7'>
+                {/*<Comment*/}
+                {/*    threadId={params.id}*/}
+                {/*    currentUserImg={user.imageUrl}*/}
+                {/*    currentUserId={JSON.stringify(userInfo._id)}*/}
+                {/*/>*/}
+            </div>
+
+            <div className='mt-10'>
+            </div>
+        </section>
     );
 };
 
