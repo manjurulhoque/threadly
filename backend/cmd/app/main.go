@@ -41,12 +41,15 @@ func main() {
 
 	userRepo := repositories.NewUserRepository(db.DB)
 	threadRepo := repositories.NewThreadRepository(db.DB)
+	commentRepo := repositories.NewCommentRepository(db.DB)
 
 	userService := services.NewUserService(userRepo)
 	threadService := services.NewThreadService(threadRepo)
+	commentService := services.NewCommentService(commentRepo)
 
 	userHandler := handlers.NewUserHandler(userService)
 	threadHandler := handlers.NewThreadHandler(threadService)
+	commentHandler := handlers.NewCommentHandler(commentService)
 
 	router.Static("/web/uploads", "./web/uploads")
 
@@ -74,6 +77,8 @@ func main() {
 		api.POST("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
 		api.GET("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsForUser)
 		api.GET("/threads/:id", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadById)
+
+		api.POST("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CreateComment)
 	}
 
 	// run the server

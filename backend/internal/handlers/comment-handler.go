@@ -23,10 +23,10 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+	threadId := c.Param("id")
 
 	var input struct {
-		Content  string `json:"content" validate:"required"`
-		ThreadId uint   `json:"thread_id" validate:"required"`
+		Content string `json:"content" validate:"required"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -41,7 +41,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 
 	comment := models.Comment{
 		Content:  input.Content,
-		ThreadId: input.ThreadId,
+		ThreadId: utils.StringToUint(threadId),
 		UserId:   userId.(uint),
 	}
 
