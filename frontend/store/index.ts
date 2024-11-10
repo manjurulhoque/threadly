@@ -1,14 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
 import threadApi from "@/store/threads/threadApi";
+import commentApi from "@/store/comments/commentApi";
 
 
 export const store = configureStore({
     reducer: {
         [threadApi.reducerPath]: threadApi.reducer,
+        [commentApi.reducerPath]: commentApi.reducer,
     },
     middleware: (getDefaultMiddleware: any) =>
         getDefaultMiddleware({}).concat(
-            threadApi.middleware
+            threadApi.middleware, commentApi.middleware
         ),
 })
 
