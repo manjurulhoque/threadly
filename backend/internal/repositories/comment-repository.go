@@ -7,6 +7,7 @@ import (
 
 type CommentRepository interface {
 	CreateComment(comment *models.Comment) error
+	CommentsByThreadId(threadId string) ([]models.Comment, error)
 }
 
 type commentRepository struct {
@@ -19,4 +20,10 @@ func NewCommentRepository(db *gorm.DB) CommentRepository {
 
 func (r *commentRepository) CreateComment(comment *models.Comment) error {
 	return r.db.Create(comment).Error
+}
+
+func (r *commentRepository) CommentsByThreadId(threadId string) ([]models.Comment, error) {
+	var comments []models.Comment
+	err := r.db.Where("thread_id = ?", threadId).Find(&comments).Error
+	return comments, err
 }

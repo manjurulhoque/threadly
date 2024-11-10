@@ -79,6 +79,7 @@ func main() {
 		api.GET("/threads/:id", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadById)
 
 		api.POST("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CreateComment)
+		api.GET("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CommentsByThreadId)
 	}
 
 	// run the server

@@ -1,8 +1,7 @@
 import Image from "next/image";
-import { permanentRedirect, redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 import { profileTabs } from "@/constants";
-
 import ThreadsTab from "@/components/shared/ThreadsTab";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,20 +13,42 @@ import { fetchUser } from "@/lib/actions/user.actions";
 
 export const metadata = {
     title: 'Profile',
-}
+};
 
 async function Page({ params }: { params: { id: number } }) {
     const data: UserSession | null = await getServerSession(authOptions);
     const user = data?.user;
+
     if (!user) {
+        console.warn("No user session found, redirecting to login.");
         permanentRedirect('/login');
+        return null;
     }
-    const userInfo = await fetchUser(params.id);
-    // if (!userInfo?.onboarded) redirect("/onboarding");
+
+    let userInfo = null;
+    try {
+        const response = await fetchUser(params.id);
+        if (!response || !response.data) {
+            console.warn("User not found or incomplete data. Redirecting to onboarding.");
+            permanentRedirect('/onboarding');
+            return null;
+        }
+        userInfo = response.data;
+    } catch (error: any) {
+        console.error("Failed to fetch user information:", error.message || error);
+        return (
+            <section className='mx-auto max-w-3xl text-center py-20'>
+                <h1 className='head-text'>Error</h1>
+                <p className='mt-3 text-base-regular dark:text-light-2'>
+                    Unable to load the profile. Please try again later.
+                </p>
+            </section>
+        );
+    }
 
     return (
         <section>
-            <ProfileHeader user={userInfo.data}/>
+            <ProfileHeader user={userInfo} />
 
             <div className='mt-9'>
                 <Tabs defaultValue='threads' className='w-full'>
@@ -58,9 +79,7 @@ async function Page({ params }: { params: { id: number } }) {
                             className='w-full text-light-1'
                         >
                             {/* @ts-ignore */}
-                            <ThreadsTab
-                                userId={params.id}
-                            />
+                            <ThreadsTab userId={params.id} />
                         </TabsContent>
                     ))}
                 </Tabs>
@@ -68,4 +87,5 @@ async function Page({ params }: { params: { id: number } }) {
         </section>
     );
 }
+
 export default Page;

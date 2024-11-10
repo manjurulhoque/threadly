@@ -16,6 +16,16 @@ func NewCommentHandler(commentService services.CommentService) *CommentHandler {
 	return &CommentHandler{commentService: commentService}
 }
 
+func (h *CommentHandler) CommentsByThreadId(c *gin.Context) {
+	threadId := c.Param("id")
+	comments, err := h.commentService.CommentsByThreadId(threadId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "comments": []models.Comment{}})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"comments": comments})
+}
+
 // CreateComment Create comment handler
 func (h *CommentHandler) CreateComment(c *gin.Context) {
 	userId, exists := c.Get("userId")
