@@ -1,9 +1,10 @@
 "use client";
 
 import { useGetCommentsByThreadIdQuery } from "@/store/comments/commentApi";
+import CommentItem from "@/components/comments/CommentItem";
 
-const CommentList = ({threadId}: {threadId: number}) => {
-    const { data, error, isLoading } = useGetCommentsByThreadIdQuery(threadId);
+const CommentList = ({threadId}: { threadId: number }) => {
+    const {data, error, isLoading} = useGetCommentsByThreadIdQuery(threadId);
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -12,12 +13,14 @@ const CommentList = ({threadId}: {threadId: number}) => {
         return <div>Error: {error}</div>;
     }
 
-    const { comments } = data;
+    const {comments} = data;
 
     return (
-        <div>
-
-        </div>
+        <>
+            {comments.map((comment) => (
+                <CommentItem key={comment.id} comment={comment}/>
+            ))}
+        </>
     );
 }
 

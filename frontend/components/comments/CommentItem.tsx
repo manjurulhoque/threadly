@@ -1,25 +1,22 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { Thread } from "@/types/thread.type";
+import Image from "next/image";
 
-interface Props {
-    thread: Thread;
-}
-
-function ThreadCard({thread}: Props) {
-    let isComment = false;
-    let {id, content, user} = thread;
+const CommentItem = ({comment}) => {
+    let {id, content, user} = comment;
 
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
     return (
-        <article className={`flex w-full flex-col rounded-xl bg-light-2 dark:bg-dark-2 p-7 shadow-md dark:shadow-none`}>
+        <article className={`flex w-full flex-col rounded-xl px-0 xs:px-7`}>
             <div className='flex items-start justify-between'>
                 <div className='flex w-full flex-1 flex-row gap-4'>
                     <div className='flex flex-col items-center'>
                         <Link href={`/profile/${user.id}`} className='relative h-11 w-11'>
                             {userImage === "" ? (
-                                <div className="relative w-10 h-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
+                                <div
+                                    className="relative w-10 h-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
                                     <svg
                                         className="absolute w-12 h-12 -left-1 text-gray-400 dark:text-gray-300"
                                         fill="currentColor"
@@ -58,7 +55,7 @@ function ThreadCard({thread}: Props) {
                             {content}
                         </p>
 
-                        <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
+                        <div className={`mb-10 mt-5 flex flex-col gap-3`}>
                             <div className='flex gap-3.5'>
                                 <Image
                                     src='/assets/heart-gray.svg'
@@ -94,11 +91,9 @@ function ThreadCard({thread}: Props) {
                         </div>
                     </div>
                 </div>
-
-                {/* TODO: Delete thread here*/}
             </div>
         </article>
     );
-}
+};
 
-export default ThreadCard;
+export default CommentItem;
