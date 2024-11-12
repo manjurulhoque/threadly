@@ -55,34 +55,11 @@ const CommentItem = ({comment}) => {
                             {content}
                         </p>
 
-                        <div className={`mb-10 mt-5 flex flex-col gap-3`}>
+                        <div className="mb-10 mt-5 flex flex-col gap-3">
                             <div className='flex gap-3.5'>
                                 <Image
                                     src='/assets/heart-gray.svg'
                                     alt='heart'
-                                    width={24}
-                                    height={24}
-                                    className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
-                                />
-                                <Link href={`/thread/${id}`}>
-                                    <Image
-                                        src='/assets/reply.svg'
-                                        alt='reply'
-                                        width={24}
-                                        height={24}
-                                        className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
-                                    />
-                                </Link>
-                                <Image
-                                    src='/assets/repost.svg'
-                                    alt='repost'
-                                    width={24}
-                                    height={24}
-                                    className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
-                                />
-                                <Image
-                                    src='/assets/share.svg'
-                                    alt='share'
                                     width={24}
                                     height={24}
                                     className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
