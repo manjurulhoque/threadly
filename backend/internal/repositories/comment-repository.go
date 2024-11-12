@@ -24,6 +24,6 @@ func (r *commentRepository) CreateComment(comment *models.Comment) error {
 
 func (r *commentRepository) CommentsByThreadId(threadId string) ([]models.CommentResponse, error) {
 	var comments []models.CommentResponse
-	err := r.db.Where("thread_id = ?", threadId).Find(&comments).Error
+	err := r.db.Where("thread_id = ?", threadId).Preload("User").Find(&comments).Error
 	return comments, err
 }
