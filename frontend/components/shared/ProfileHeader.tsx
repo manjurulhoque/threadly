@@ -6,6 +6,8 @@ import { User } from "@/types/user.type";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { UserPlusIcon } from "lucide-react";
+import { useFollowUserMutation } from "@/store/follow/followApi";
+import { toast } from "react-toastify";
 
 interface Props {
     user: User;
@@ -14,9 +16,16 @@ interface Props {
 function ProfileHeader({ user }: Props) {
     const { data: session, status } = useSession();
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
+    const [followUser, {isLoading, isError, error}] = useFollowUserMutation(session?.user?.id);
 
-    const followUser = () => {
+    const onClickFollowUser = () => {
         console.log('Follow user');
+        followUser(user.id).unwrap().then(() => {
+            console.log('User followed');
+            toast.success("User followed successfully");
+        }).catch((error) => {
+            console.error('Failed to follow user:', error);
+        });
     };
 
     return (
@@ -72,7 +81,7 @@ function ProfileHeader({ user }: Props) {
                         session?.user?.id !== user.id ? (
                             <Button
                                 className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
-                                onClick={() => followUser}
+                                onClick={onClickFollowUser}
                             >
                                 <UserPlusIcon className="w-5 h-5"/>
                                 Follow
