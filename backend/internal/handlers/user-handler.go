@@ -180,3 +180,13 @@ func (h *UserHandler) UpdateUserProfile(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User profile updated successfully"})
 }
+
+func (h *UserHandler) GetSimilarMinds(c *gin.Context) {
+	userId, _ := c.Get("userId")
+	users, err := h.userService.GetSimilarMinds(userId.(uint))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": users})
+}

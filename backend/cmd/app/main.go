@@ -73,6 +73,7 @@ func main() {
 		api.POST("/token/refresh", userHandler.Refresh)
 		api.GET("/users/:id", userHandler.GetUserById)
 		api.PUT("/users/update-profile", middlewares.AuthMiddleware(userRepo, userService), userHandler.UpdateUserProfile)
+		api.GET("/similar-minds", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetSimilarMinds)
 
 		api.POST("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
 		api.GET("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsForUser)

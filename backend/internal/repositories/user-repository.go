@@ -11,6 +11,7 @@ type UserRepository interface {
 	GetUserByEmail(email string) (*models.User, error)
 	FindUserByEmail(email string) bool
 	UpdateUser(uint, map[string]interface{}) error
+	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
 }
 
 type userRepository struct {
@@ -45,4 +46,22 @@ func (r *userRepository) FindUserByEmail(email string) bool {
 
 func (r *userRepository) UpdateUser(userId uint, updates map[string]interface{}) error {
 	return r.db.Model(&models.User{}).Where("id = ?", userId).Updates(updates).Error
+}
+
+// GetSimilarMinds retrieves random users whom the user hasn't followed
+func (r *userRepository) GetSimilarMinds(userId uint) ([]models.PublicUser, error) {
+	var users []models.PublicUser
+	err := r.db.Raw(`
+		SELECT id, name, username, image, bio, onboarded
+		FROM users
+		WHERE id != ? 
+		  AND id NOT IN (
+		      SELECT followee_id 
+		      FROM follows 
+		      WHERE follower_id = ?
+		  )
+		ORDER BY RANDOM()
+		LIMIT 5
+	`, userId, userId).Scan(&users).Error
+	return users, err
 }

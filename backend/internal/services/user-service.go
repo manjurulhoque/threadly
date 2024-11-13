@@ -24,6 +24,7 @@ type UserService interface {
 	VerifyToken(token string) (*JWTCustomClaims, error)
 	GetUserById(userId uint) (*models.PublicUser, error)
 	UpdateUser(uint, map[string]interface{}) error
+	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
 }
 
 var jwtSecret = []byte("ABC123")
@@ -181,4 +182,26 @@ func (s *userService) GetUserById(userId uint) (*models.PublicUser, error) {
 // UpdateUser Update User
 func (s *userService) UpdateUser(userId uint, updates map[string]interface{}) error {
 	return s.userRepo.UpdateUser(userId, updates)
+}
+
+// GetSimilarMinds Get Similar Minds
+func (s *userService) GetSimilarMinds(userId uint) ([]models.PublicUser, error) {
+	users, err := s.userRepo.GetSimilarMinds(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	var similarMinds []models.PublicUser
+	for _, user := range users {
+		similarMinds = append(similarMinds, models.PublicUser{
+			Id:        user.Id,
+			Name:      user.Name,
+			Username:  user.Username,
+			Image:     user.Image,
+			Bio:       user.Bio,
+			Onboarded: user.Onboarded,
+		})
+	}
+
+	return similarMinds, nil
 }
