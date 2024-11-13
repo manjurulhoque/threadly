@@ -84,6 +84,7 @@ func main() {
 
 		api.POST("/users/:id/follow", middlewares.AuthMiddleware(userRepo, userService), handlers.FollowUser)
 		api.DELETE("/users/:id/unfollow", middlewares.AuthMiddleware(userRepo, userService), handlers.UnfollowUser)
+		api.GET("/users/:id/following", middlewares.AuthMiddleware(userRepo, userService), userHandler.IsFollowing)
 	}
 
 	// run the server

@@ -190,3 +190,19 @@ func (h *UserHandler) GetSimilarMinds(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"data": users})
 }
+
+// IsFollowing Check if current logged-in user is following another user
+func (h *UserHandler) IsFollowing(c *gin.Context) {
+	userId, _ := c.Get("userId") // Get the current logged-in user ID
+	userIdInt, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user id"})
+		return
+	}
+	isFollowing, err := h.userService.IsFollowing(uint(userIdInt), userId.(uint))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": isFollowing})
+}

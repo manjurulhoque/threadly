@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) bool
 	UpdateUser(uint, map[string]interface{}) error
 	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
+	IsFollowing(followeeId, followerId uint) (bool, error)
 }
 
 type userRepository struct {
@@ -64,4 +65,11 @@ func (r *userRepository) GetSimilarMinds(userId uint) ([]models.PublicUser, erro
 		LIMIT 5
 	`, userId, userId).Scan(&users).Error
 	return users, err
+}
+
+// IsFollowing checks if the user is following another user
+func (r *userRepository) IsFollowing(followeeId, followerId uint) (bool, error) {
+	var count int64
+	err := r.db.Model(&models.Follow{}).Where("followee_id = ? AND follower_id = ?", followeeId, followerId).Count(&count).Error
+	return count > 0, err
 }
