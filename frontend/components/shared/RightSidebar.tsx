@@ -29,7 +29,7 @@ async function RightSidebar() {
             <div className='flex flex-1 flex-col justify-start'>
                 <h3 className='text-heading4-medium dark:text-light-1'>Similar Minds</h3>
                 <div className='mt-7 flex w-[350px] flex-col gap-10'>
-                    {similarMinds.length > 0 ? (
+                    {similarMinds?.length > 0 ? (
                         <>
                             {similarMinds.map((person) => (
                                 <UserCard

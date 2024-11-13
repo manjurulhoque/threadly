@@ -64,12 +64,19 @@ function ProfileHeader({ user }: Props) {
                             </Link>
                         ) : null
                     }
-                    <Button
-                        className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 px-4 py-2 dark:text-light-2"
-                    >
-                        <UserPlusIcon className="w-5 h-5"/>
-                        Follow
-                    </Button>
+                    {
+                        session?.user?.id !== user.id ? (
+                            <Button
+                                className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
+                                onClick={() => {
+                                    console.log("Follow user");
+                                }}
+                            >
+                                <UserPlusIcon className="w-5 h-5"/>
+                                Follow
+                            </Button>
+                        ) : null
+                    }
                 </div>
             </div>
 

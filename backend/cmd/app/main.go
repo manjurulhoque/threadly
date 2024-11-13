@@ -71,7 +71,7 @@ func main() {
 		api.POST("/register", userHandler.Register)
 		api.POST("/login", userHandler.Login)
 		api.POST("/token/refresh", userHandler.Refresh)
-		api.GET("/users/:id", userHandler.GetUserById)
+		api.GET("/users/:id", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetUserById)
 		api.PUT("/users/update-profile", middlewares.AuthMiddleware(userRepo, userService), userHandler.UpdateUserProfile)
 		api.GET("/similar-minds", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetSimilarMinds)
 
