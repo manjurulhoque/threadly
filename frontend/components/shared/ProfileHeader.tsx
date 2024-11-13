@@ -6,8 +6,9 @@ import { User } from "@/types/user.type";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle, Trash, UserPlusIcon } from "lucide-react";
-import { useFollowUserMutation, useIsFollowingQuery } from "@/store/follow/followApi";
+import { useFollowUserMutation, useIsFollowingQuery, useUnfollowUserMutation } from "@/store/follow/followApi";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 interface Props {
     user: User;
@@ -16,18 +17,30 @@ interface Props {
 function ProfileHeader({ user }: Props) {
     const { data: session, status } = useSession();
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
-    const [followUser, {isLoading, isError, error}] = useFollowUserMutation();
-    let {data: result, isLoading: isLoadingIsFollow} = useIsFollowingQuery(user.id);
-    let isFollowing = result?.data;
+    const [ followUser, { isLoading, isError, error } ] = useFollowUserMutation();
+    const [ unfollowUser ] = useUnfollowUserMutation();
+    let { data: result, isLoading: isLoadingIsFollow } = useIsFollowingQuery(user.id);
+    let [isFollowing, setIsFollowing] = useState(result?.data);
 
     const onClickFollowUser = () => {
         followUser(user.id).unwrap().then(() => {
             console.log('User followed');
             toast.success("User followed successfully");
-            isFollowing = true;
+            setIsFollowing(true);
         }).catch((error) => {
             console.error('Failed to follow user:', error);
             toast.error("Failed to follow user");
+        });
+    };
+
+    const onClickUnfollowUser = () => {
+        unfollowUser(user.id).unwrap().then(() => {
+            console.log('User unfollowed');
+            toast.success("User unfollowed successfully");
+            setIsFollowing(false);
+        }).catch((error) => {
+            console.error('Failed to unfollow user:', error);
+            toast.error("Failed to unfollow user");
         });
     };
 
@@ -82,23 +95,25 @@ function ProfileHeader({ user }: Props) {
                     }
                     {session?.user?.id !== user.id ? (
                         isLoadingIsFollow ? (
-                            <LoaderCircle className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-300" />
-                        ) : isFollowing === false ? (
-                            <Button
-                                className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
-                                onClick={onClickFollowUser}
-                            >
-                                <UserPlusIcon className="w-5 h-5" />
-                                Follow
-                            </Button>
+                            <LoaderCircle className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-300"/>
                         ) : (
-                            <Button
-                                className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
-                                onClick={onClickFollowUser}
-                            >
-                                <Trash className="w-5 h-5" />
-                                Unfollow
-                            </Button>
+                            !isFollowing ? (
+                                <Button
+                                    className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
+                                    onClick={onClickFollowUser}
+                                >
+                                    <UserPlusIcon className="w-5 h-5"/>
+                                    Follow
+                                </Button>
+                            ) : (
+                                <Button
+                                    className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
+                                    onClick={onClickUnfollowUser}
+                                >
+                                    <Trash className="w-5 h-5"/>
+                                    Unfollow
+                                </Button>
+                            )
                         )
                     ) : null}
                 </div>
