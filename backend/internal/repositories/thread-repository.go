@@ -25,7 +25,14 @@ func (r *threadRepository) CreateThread(thread *models.Thread) error {
 
 func (r *threadRepository) GetThreadsForUser(userId uint) ([]models.Thread, error) {
 	var threads []models.Thread
-	err := r.db.Where("user_id = ?", userId).Preload("User").Order("created_at desc").Find(&threads).Error
+
+	err := r.db.
+		Joins("LEFT JOIN follows f ON threads.user_id = f.followee_id").
+		Where("threads.user_id = ? OR f.follower_id = ?", userId, userId).
+		Preload("User").
+		Order("threads.created_at DESC").
+		Find(&threads).Error
+
 	return threads, err
 }
 
