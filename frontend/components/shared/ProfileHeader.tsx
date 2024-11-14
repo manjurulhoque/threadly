@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LoaderCircle, Trash, UserPlusIcon } from "lucide-react";
 import { useFollowUserMutation, useIsFollowingQuery, useUnfollowUserMutation } from "@/store/follow/followApi";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
     user: User;
@@ -19,12 +19,19 @@ function ProfileHeader({ user }: Props) {
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
     const [ followUser, { isLoading, isError, error } ] = useFollowUserMutation();
     const [ unfollowUser ] = useUnfollowUserMutation();
-    let { data: result, isLoading: isLoadingIsFollow } = useIsFollowingQuery(user.id);
-    let [isFollowing, setIsFollowing] = useState(result?.data);
+    let { data: result, isLoading: isLoadingIsFollow, isSuccess } = useIsFollowingQuery(user.id);
+    // State to track whether the user is followed
+    const [isFollowing, setIsFollowing] = useState<boolean>(false);
+
+    // Update `isFollowing` state when `result` changes
+    useEffect(() => {
+        if (result?.data !== undefined) {
+            setIsFollowing(result.data);
+        }
+    }, [result]);
 
     const onClickFollowUser = () => {
         followUser(user.id).unwrap().then(() => {
-            console.log('User followed');
             toast.success("User followed successfully");
             setIsFollowing(true);
         }).catch((error) => {
@@ -35,7 +42,6 @@ function ProfileHeader({ user }: Props) {
 
     const onClickUnfollowUser = () => {
         unfollowUser(user.id).unwrap().then(() => {
-            console.log('User unfollowed');
             toast.success("User unfollowed successfully");
             setIsFollowing(false);
         }).catch((error) => {
