@@ -2,8 +2,8 @@ package models
 
 type Like struct {
 	BaseModel
-	UserID   uint `json:"user_id" gorm:"not null"`   // User who liked
-	ThreadID uint `json:"thread_id" gorm:"not null"` // Thread being liked
+	UserId   uint `json:"user_id" gorm:"not null"`   // User who liked
+	ThreadId uint `json:"thread_id" gorm:"not null"` // Thread being liked
 
 	// Associations
 	User   User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
