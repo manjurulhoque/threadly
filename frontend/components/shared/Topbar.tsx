@@ -4,7 +4,7 @@ import { ModeToggle } from "@/components/shared/ModeToggle";
 
 function TopBar() {
     return (
-        <nav className='topbar'>
+        <nav className="topbar border-b border-gray-700">
             <Link href='/' className='flex items-center gap-4'>
                 <Image src='/logo.svg' alt='logo' width={28} height={28}/>
                 <p className='text-heading3-bold dark:text-light-1 max-xs:hidden'>Threadly</p>
@@ -20,7 +20,7 @@ function TopBar() {
             </div>
 
             <div className='flex items-center gap-2'>
-                <ModeToggle />
+                <ModeToggle/>
 
                 <div className='block md:hidden'>
                     <div className='flex cursor-pointer invert-0 dark:invert brightness-0 dark:brightness-200'>
