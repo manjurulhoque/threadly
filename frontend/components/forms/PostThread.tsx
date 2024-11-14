@@ -55,7 +55,7 @@ const PostThread = (Props) => {
     return (
         <Form {...form}>
             <form
-                className='flex flex-col justify-start gap-3'
+                className='flex flex-col justify-start gap-3 mt-4'
                 onSubmit={form.handleSubmit(onSubmit)}
             >
                 <FormField
@@ -63,9 +63,9 @@ const PostThread = (Props) => {
                     name='content'
                     render={({field}) => (
                         <FormItem className='flex w-full flex-col gap-3'>
-                            <FormLabel className='text-base-semibold text-light-2'>
-                                Content
-                            </FormLabel>
+                            {/*<FormLabel className='text-base-semibold text-light-2'>*/}
+                            {/*    Content*/}
+                            {/*</FormLabel>*/}
                             <FormControl className='no-focus border border-dark-4 dark:bg-dark-3 dark:text-light-1'>
                                 <Textarea rows={5} {...field} />
                             </FormControl>
@@ -79,7 +79,7 @@ const PostThread = (Props) => {
                         {isLoading ? (
                             <Loader className="animate-spin w-5 h-5 mr-2"/>
                         ) : (
-                            <span>Post Thread</span>
+                            <span className="dark:text-light-2">Post Thread</span>
                         )}
                     </Button>
                 </div>
