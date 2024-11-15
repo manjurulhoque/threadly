@@ -206,3 +206,16 @@ func (h *UserHandler) IsFollowing(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"data": isFollowing})
 }
+
+// GetThreadsForUser Get threads for a user
+func (h *UserHandler) GetThreadsForUser(c *gin.Context) {
+	userId := c.Param("id")
+
+	threads, err := h.userService.GetThreadsForUser(utils.StringToUint(userId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"threads": threads})
+}

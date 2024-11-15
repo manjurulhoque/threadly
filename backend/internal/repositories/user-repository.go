@@ -13,6 +13,7 @@ type UserRepository interface {
 	UpdateUser(uint, map[string]interface{}) error
 	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
 	IsFollowing(followeeId, followerId uint) (bool, error)
+	GetThreadsForUser(userId uint) ([]models.Thread, error)
 }
 
 type userRepository struct {
@@ -72,4 +73,11 @@ func (r *userRepository) IsFollowing(followeeId, followerId uint) (bool, error) 
 	var count int64
 	err := r.db.Model(&models.Follow{}).Where("followee_id = ? AND follower_id = ?", followeeId, followerId).Count(&count).Error
 	return count > 0, err
+}
+
+// GetThreadsForUser retrieves all threads for a user
+func (r *userRepository) GetThreadsForUser(userId uint) ([]models.Thread, error) {
+	var threads []models.Thread
+	err := r.db.Where("user_id = ?", userId).Find(&threads).Error
+	return threads, err
 }

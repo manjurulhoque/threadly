@@ -26,6 +26,7 @@ type UserService interface {
 	UpdateUser(uint, map[string]interface{}) error
 	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
 	IsFollowing(followeeId, followerId uint) (bool, error)
+	GetThreadsForUser(userId uint) ([]models.Thread, error)
 }
 
 var jwtSecret = []byte("ABC123")
@@ -210,4 +211,9 @@ func (s *userService) GetSimilarMinds(userId uint) ([]models.PublicUser, error) 
 // IsFollowing Check if user is following another user
 func (s *userService) IsFollowing(followeeId, followerId uint) (bool, error) {
 	return s.userRepo.IsFollowing(followeeId, followerId)
+}
+
+// GetThreadsForUser Get Threads For User
+func (s *userService) GetThreadsForUser(userId uint) ([]models.Thread, error) {
+	return s.userRepo.GetThreadsForUser(userId)
 }
