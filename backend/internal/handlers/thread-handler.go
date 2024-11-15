@@ -32,6 +32,11 @@ func (h *ThreadHandler) GetThreadsForUser(c *gin.Context) {
 		return
 	}
 
+	// Format content for each thread
+	for i := range threads {
+		threads[i].Content = utils.FormatThreadContent(threads[i].Content)
+	}
+
 	c.JSON(http.StatusOK, gin.H{"threads": threads})
 }
 

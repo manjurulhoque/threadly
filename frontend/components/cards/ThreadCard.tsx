@@ -88,9 +88,7 @@ function ThreadCard({ thread }: Props) {
                             </h4>
                         </Link>
 
-                        <p className='mt-2 text-small-regular text-dark-2 dark:text-light-2'>
-                            {content}
-                        </p>
+                        <p className='mt-2 text-small-regular text-dark-2 dark:text-light-2' dangerouslySetInnerHTML={{ __html: content }}/>
 
                         <div className={`mt-5 flex flex-col gap-3`}>
                             <div className='flex gap-3.5'>
