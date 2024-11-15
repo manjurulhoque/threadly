@@ -2,27 +2,68 @@
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useAddThreadMutation } from "@/store/threads/threadApi";
 import { toast } from "react-toastify";
 import { Loader } from "lucide-react";
+import { Mention, MentionsInput } from "react-mentions"; // React-Mentions library
+import { useSession } from "next-auth/react";
 
-interface Props {
-}
+// Styles for MentionsInput
+const mentionStyle = {
+    control: {
+        fontSize: 16,
+        fontWeight: "normal",
+        minHeight: 150, // Adjust height for more rows
+        overflow: "auto", // Enable scrolling for large content
+    },
+    highlighter: {
+        overflow: "hidden",
+    },
+    input: {
+        margin: 0,
+    },
+    "&multiLine": {
+        control: {
+            minHeight: 150, // Adjust height here
+        },
+        highlighter: {
+            padding: 1,
+            border: '1px solid transparent',
+        },
+        input: {
+            padding: 1,
+        },
+    },
 
-const PostThread = (Props) => {
-    const [mounted, setMounted] = useState(false);
+    suggestions: {
+        list: {
+            backgroundColor: 'black',
+            border: '1px solid rgba(0,0,0,0.15)',
+            fontSize: 14,
+        },
+        item: {
+            padding: '5px 15px',
+            borderBottom: '1px solid rgba(0,0,0,0.15)',
+            '&focused': {
+                backgroundColor: '#4e4949',
+            },
+        },
+    },
+};
+
+const PostThread = () => {
+    const [ mounted, setMounted ] = useState(false);
     const router = useRouter();
-    const pathname = usePathname();
-    const [addThread, {isLoading, isError, error}] = useAddThreadMutation();
+    const [ addThread, { isLoading } ] = useAddThreadMutation();
+    const [ mentions, setMentions ] = useState([]); // To track mentions
+    const { data: session } = useSession();
 
     const form = useForm<z.infer<any>>({
-        // resolver: zodResolver(ThreadValidation),
         defaultValues: {
             content: "",
         },
@@ -37,10 +78,28 @@ const PostThread = (Props) => {
         return null; // Avoid rendering anything during SSR
     }
 
+    const fetchSuggestions = (query, callback) => {
+        if (!query) return;
+        fetch(`${process.env.BACKEND_BASE_URL}/api/user-suggestions?query=${query}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access}`,
+            },
+            method: 'GET',
+        }).then((response) => {
+            return response.json();
+        }).then((res) => res?.users?.map((user) => ({
+                id: user.id,
+                display: user.username,
+            }))
+        ).then(callback)
+    };
+
     const onSubmit = async (values: z.infer<any>) => {
         try {
             await addThread({
                 content: values.content,
+                mentions: mentions.map((mention: any) => mention.id), // Pass mentioned user IDs
             }).unwrap();
             toast.success("Thread posted successfully");
             setTimeout(() => {
@@ -55,19 +114,45 @@ const PostThread = (Props) => {
     return (
         <Form {...form}>
             <form
-                className='flex flex-col justify-start gap-3 mt-4'
+                className="flex flex-col justify-start gap-3 mt-4"
                 onSubmit={form.handleSubmit(onSubmit)}
             >
                 <FormField
                     control={form.control}
-                    name='content'
-                    render={({field}) => (
-                        <FormItem className='flex w-full flex-col gap-3'>
-                            {/*<FormLabel className='text-base-semibold text-light-2'>*/}
-                            {/*    Content*/}
-                            {/*</FormLabel>*/}
-                            <FormControl className='no-focus border border-dark-4 dark:bg-dark-3 dark:text-light-1'>
-                                <Textarea rows={5} {...field} />
+                    name="content"
+                    render={({ field }) => (
+                        <FormItem className="flex w-full flex-col gap-3">
+                            <FormControl className="no-focus border border-dark-4 dark:bg-dark-3 dark:text-light-1">
+                                <MentionsInput
+                                    {...field}
+                                    style={mentionStyle}
+                                    value={field.value}
+                                    onChange={(e) => {
+                                        field.onChange(e.target.value);
+                                    }}
+                                    placeholder="Type your thread content and mention users with @"
+                                    a11ySuggestionsListLabel={"Suggested mentions"}
+                                >
+                                    <Mention
+                                        trigger="@"
+                                        data={fetchSuggestions}
+                                        style={{ backgroundColor: "rgb(135 126 255)" }}
+                                        onAdd={(id, display) => {
+                                            setMentions([...mentions, { id, display }]);
+                                        }}
+                                        renderSuggestion={(
+                                            suggestion,
+                                            search,
+                                            highlightedDisplay,
+                                            index,
+                                            focused
+                                        ) => (
+                                            <div className={`user ${focused ? 'focused' : ''}`}>
+                                                {highlightedDisplay}
+                                            </div>
+                                        )}
+                                    />
+                                </MentionsInput>
                             </FormControl>
                             <FormMessage/>
                         </FormItem>
@@ -75,7 +160,7 @@ const PostThread = (Props) => {
                 />
 
                 <div className="flex justify-end">
-                    <Button type='submit' className='dark:bg-primary-500' disabled={isLoading}>
+                    <Button type="submit" className="dark:bg-primary-500 dark:hover:bg-primary-400" disabled={isLoading}>
                         {isLoading ? (
                             <Loader className="animate-spin w-5 h-5 mr-2"/>
                         ) : (
@@ -85,7 +170,7 @@ const PostThread = (Props) => {
                 </div>
             </form>
         </Form>
-);
-}
+    );
+};
 
 export default PostThread;

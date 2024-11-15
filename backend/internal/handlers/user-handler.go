@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/manjurulhoque/threadly/backend/internal/db"
+	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
 	"github.com/manjurulhoque/threadly/backend/pkg/utils"
 	"log/slog"
@@ -218,4 +220,24 @@ func (h *UserHandler) GetThreadsForUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"threads": threads})
+}
+
+// GetUserSuggestions Get user suggestions for autocomplete
+func (h *UserHandler) GetUserSuggestions(c *gin.Context) {
+	userID, _ := c.Get("userId")
+	query := c.Query("query") // Query string for autocomplete
+
+	var users []models.PublicUser
+	err := db.DB.Table("follows").
+		Select("users.id, users.username, users.name").
+		Joins("JOIN users ON follows.followee_id = users.id").
+		Where("follows.follower_id = ? AND users.username LIKE ?", userID, "%"+query+"%").
+		Find(&users).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": users})
 }

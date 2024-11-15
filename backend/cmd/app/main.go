@@ -27,7 +27,7 @@ func init() {
 		panic(err)
 	}
 
-	err = db.DB.AutoMigrate(&models.User{}, &models.Community{}, &models.Thread{}, &models.Comment{}, &models.Follow{}, &models.Like{})
+	err = db.DB.AutoMigrate(&models.User{}, &models.Community{}, &models.Thread{}, &models.Comment{}, &models.Follow{}, &models.Like{}, &models.Mention{})
 	if err != nil {
 		slog.Error("Error migrating database", "error", err.Error())
 		panic(fmt.Sprintf("Error migrating database: %v", err))
@@ -94,6 +94,7 @@ func main() {
 		api.GET("/users/:id/is-following", middlewares.AuthMiddleware(userRepo, userService), userHandler.IsFollowing)
 		api.GET("/users/:id/threads", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetThreadsForUser)
 		api.GET("/users/:id/replied-threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsUserReplied)
+		api.GET("/user-suggestions", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetUserSuggestions)
 	}
 
 	// run the server
