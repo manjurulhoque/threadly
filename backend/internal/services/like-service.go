@@ -7,6 +7,7 @@ import (
 
 type LikeService interface {
 	LikeThread(like *models.Like) error
+	GetLikeByUserAndThread(userId, threadId uint, like *models.Like) error
 }
 
 type likeService struct {
@@ -19,4 +20,8 @@ func NewLikeService(repo repositories.LikeRepository) LikeService {
 
 func (s *likeService) LikeThread(like *models.Like) error {
 	return s.likeRepo.LikeThread(like)
+}
+
+func (s *likeService) GetLikeByUserAndThread(userId, threadId uint, like *models.Like) error {
+	return s.likeRepo.GetLikeByUserAndThread(userId, threadId, like)
 }

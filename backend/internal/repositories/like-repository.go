@@ -7,6 +7,7 @@ import (
 
 type LikeRepository interface {
 	LikeThread(like *models.Like) error
+	GetLikeByUserAndThread(userId, threadId uint, like *models.Like) error
 }
 
 type likeRepository struct {
@@ -19,4 +20,8 @@ func NewLikeRepository(db *gorm.DB) LikeRepository {
 
 func (r *likeRepository) LikeThread(like *models.Like) error {
 	return r.db.Create(like).Error
+}
+
+func (r *likeRepository) GetLikeByUserAndThread(userId, threadId uint, like *models.Like) error {
+	return r.db.Where("user_id = ? AND thread_id = ?", userId, threadId).First(like).Error
 }

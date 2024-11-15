@@ -25,6 +25,14 @@ func (h *LikeHandler) LikeThread(c *gin.Context) {
 		return
 	}
 
+	// Check if the user is already liked the thread
+	var existingLike models.Like
+	if err := h.likeService.GetLikeByUserAndThread(userId.(uint), uint(threadId), &existingLike); err == nil {
+		// Record exists, meaning the user is already liked the thread
+		c.JSON(http.StatusConflict, gin.H{"error": "You already liked this thread"})
+		return
+	}
+
 	like := models.Like{
 		UserId:   userId.(uint),
 		ThreadId: uint(threadId),
