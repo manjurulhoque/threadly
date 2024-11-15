@@ -94,6 +94,11 @@ function ThreadCard({ thread }: Props) {
 
                         <div className={`mt-5 flex flex-col gap-3`}>
                             <div className='flex gap-3.5'>
+                                {thread.like_count > 0 && (
+                                    <p className='text-sm text-dark-2 dark:text-light-2'>
+                                        {thread.like_count} {thread.like_count > 1 ? "likes" : "like"}
+                                    </p>
+                                )}
                                 {
                                     isLiked ? (
                                         <Image

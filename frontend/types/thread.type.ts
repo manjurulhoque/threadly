@@ -4,9 +4,10 @@ export interface Thread {
     id: number;
     content: string;
     user_id: number;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
     user: User;
     is_liked: boolean;
+    like_count: number;
 }
