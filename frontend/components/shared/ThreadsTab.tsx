@@ -1,15 +1,27 @@
-import { redirect } from "next/navigation";
+"use client";
 
 import ThreadCard from "../cards/ThreadCard";
+import { useGetThreadsByUserQuery } from "@/store/threads/threadApi";
 
 interface Props {
     userId: number;
 }
 
-async function ThreadsTab({ userId }: Props) {
+const ThreadsTab = ({ userId }: Props) => {
+    const { data, isLoading } = useGetThreadsByUserQuery(userId);
+    const threads = data?.threads || [];
+
+    if (isLoading) {
+        return <p>Loading...</p>;
+    }
+
     return (
         <section className='mt-9 flex flex-col gap-10'>
-            {/*<ThreadCard/>*/}
+            {
+                threads?.map((thread) => (
+                    <ThreadCard key={thread.id} thread={thread} />
+                ))
+            }
         </section>
     );
 }

@@ -78,6 +78,6 @@ func (r *userRepository) IsFollowing(followeeId, followerId uint) (bool, error) 
 // GetThreadsForUser retrieves all threads for a user
 func (r *userRepository) GetThreadsForUser(userId uint) ([]models.Thread, error) {
 	var threads []models.Thread
-	err := r.db.Where("user_id = ?", userId).Find(&threads).Error
+	err := r.db.Where("user_id = ?", userId).Preload("User").Find(&threads).Error
 	return threads, err
 }
