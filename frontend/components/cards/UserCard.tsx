@@ -42,8 +42,8 @@ function UserCard({ user }: Props) {
                 </div>
 
                 <div className='flex-1 text-ellipsis'>
-                    <h4 className='text-base-semibold text-light-1'>{user.name}</h4>
-                    <p className='text-small-medium text-gray-1'>@{user.username}</p>
+                    <h4 className='text-base-semibold dark:text-light-1'>{user.name}</h4>
+                    <p className='text-small-medium dark:text-gray-1'>@{user.username}</p>
                 </div>
             </div>
 

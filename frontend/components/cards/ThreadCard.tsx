@@ -11,8 +11,7 @@ interface Props {
 }
 
 function ThreadCard({ thread }: Props) {
-    let isComment = false;
-    let { id, content, user } = thread;
+    let { id, content, user, is_liked } = thread;
     const [ likeThread, { isLoading } ] = useLikeThreadMutation();
 
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
@@ -73,16 +72,29 @@ function ThreadCard({ thread }: Props) {
                             {content}
                         </p>
 
-                        <div className={`${isComment && "mb-10"} mt-5 flex flex-col gap-3`}>
+                        <div className={`mt-5 flex flex-col gap-3`}>
                             <div className='flex gap-3.5'>
-                                <Image
-                                    src='/assets/heart-gray.svg'
-                                    alt='heart'
-                                    width={24}
-                                    height={24}
-                                    className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
-                                    onClick={onClickHeart}
-                                />
+                                {
+                                    is_liked ? (
+                                        <Image
+                                            src='/assets/heart-filled.svg'
+                                            alt='heart'
+                                            width={24}
+                                            height={24}
+                                            className='cursor-pointer object-contain dark:brightness-300'
+                                            onClick={onClickHeart}
+                                        />
+                                    ) : (
+                                        <Image
+                                            src='/assets/heart-gray.svg'
+                                            alt='heart'
+                                            width={24}
+                                            height={24}
+                                            className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
+                                            onClick={onClickHeart}
+                                        />
+                                    )
+                                }
                                 <Link href={`/thread/${id}`}>
                                     <Image
                                         src='/assets/reply.svg'
