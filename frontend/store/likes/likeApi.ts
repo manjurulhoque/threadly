@@ -13,10 +13,17 @@ export const likeApi = createApi({
             }),
             invalidatesTags: [ 'Like' ],
         }),
+        unlikeThread: builder.mutation<void, void>({
+            query: (threadId: number) => ({
+                url: `threads/${threadId}/like`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: [ 'Like' ],
+        })
     }),
 });
 
-export const { useLikeThreadMutation } = likeApi;
+export const { useLikeThreadMutation, useUnlikeThreadMutation } = likeApi;
 
 export default likeApi;
 
