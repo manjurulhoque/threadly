@@ -86,6 +86,7 @@ func main() {
 		api.GET("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CommentsByThreadId)
 
 		api.POST("/threads/:id/like", middlewares.AuthMiddleware(userRepo, userService), likeHandler.LikeThread)
+		api.DELETE("/threads/:id/unlike", middlewares.AuthMiddleware(userRepo, userService), likeHandler.UnlikeThread)
 
 		api.POST("/users/:id/follow", middlewares.AuthMiddleware(userRepo, userService), handlers.FollowUser)
 		api.DELETE("/users/:id/unfollow", middlewares.AuthMiddleware(userRepo, userService), handlers.UnfollowUser)
