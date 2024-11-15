@@ -11,6 +11,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { fetchTotalThreadsByUser } from "@/lib/actions/thread.actions";
+import RepliedThreadsTab from "@/components/shared/RepliedThreadsTab";
 
 export const metadata = async ({ params }: { params: { id: number } }) => {
     if (!params?.id) {
@@ -86,16 +87,27 @@ async function Page({ params }: { params: { id: number } }) {
                             </TabsTrigger>
                         ))}
                     </TabsList>
-                    {profileTabs.map((tab) => (
-                        <TabsContent
-                            key={`content-${tab.label}`}
-                            value={tab.value}
-                            className='w-full text-light-1'
-                        >
-                            {/* @ts-ignore */}
-                            <ThreadsTab userId={params.id} />
-                        </TabsContent>
-                    ))}
+                    <TabsContent
+                        value="threads"
+                        className='w-full text-light-1'
+                    >
+                        {/* @ts-ignore */}
+                        <ThreadsTab userId={params.id} />
+                    </TabsContent>
+                    <TabsContent
+                        value="replies"
+                        className='w-full text-light-1'
+                    >
+                        {/* @ts-ignore */}
+                        <RepliedThreadsTab userId={params.id} />
+                    </TabsContent>
+                    <TabsContent
+                        value="tagged"
+                        className='w-full text-light-1'
+                    >
+                        {/* @ts-ignore */}
+                        <ThreadsTab userId={params.id} />
+                    </TabsContent>
                 </Tabs>
             </div>
         </section>
