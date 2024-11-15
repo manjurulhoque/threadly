@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { permanentRedirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 
 import { profileTabs } from "@/constants";
 import ThreadsTab from "@/components/shared/ThreadsTab";
@@ -10,9 +10,16 @@ import { UserSession } from "@/types/user-session.type";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { fetchUser } from "@/lib/actions/user.actions";
+import { fetchTotalThreadsByUser } from "@/lib/actions/thread.actions";
 
-export const metadata = {
-    title: 'Profile',
+export const metadata = async ({ params }: { params: { id: number } }) => {
+    if (!params?.id) {
+        return { title: "Profile" };
+    }
+    const user = await fetchUser(params.id);
+    return {
+        title: user?.data?.name || "Profile",
+    };
 };
 
 async function Page({ params }: { params: { id: number } }) {
@@ -21,16 +28,17 @@ async function Page({ params }: { params: { id: number } }) {
 
     if (!user) {
         console.warn("No user session found, redirecting to login.");
-        permanentRedirect('/login');
+        redirect('/login');
         return null;
     }
 
     let userInfo = null;
+    let totalThreads = 0;
     try {
         const response = await fetchUser(params.id);
         if (!response || !response.data) {
             console.warn("User not found or incomplete data. Redirecting to onboarding.");
-            permanentRedirect('/onboarding');
+            redirect('/onboarding');
             return null;
         }
         userInfo = response.data;
@@ -44,6 +52,12 @@ async function Page({ params }: { params: { id: number } }) {
                 </p>
             </section>
         );
+    }
+
+    try {
+        totalThreads = await fetchTotalThreadsByUser(params.id);
+    } catch (error: any) {
+        console.error("Failed to fetch total threads by user:", error.message || error);
     }
 
     return (
@@ -66,7 +80,7 @@ async function Page({ params }: { params: { id: number } }) {
 
                                 {tab.label === "Threads" && (
                                     <p className='ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2'>
-                                        5
+                                        {totalThreads}
                                     </p>
                                 )}
                             </TabsTrigger>

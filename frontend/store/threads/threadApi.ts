@@ -5,7 +5,7 @@ import { Thread } from "@/types/thread.type";
 const threadApi = createApi({
     reducerPath: "threadApi",
     baseQuery: DynamicBaseQuery,
-    tagTypes: ["Thread"],
+    tagTypes: [ "Thread" ],
     endpoints: (builder) => ({
         getThreads: builder.query<Thread[], void>({
             query: () => "threads",
@@ -20,6 +20,9 @@ const threadApi = createApi({
                 body: thread,
             }),
         }),
+        totalThreadsByUser: builder.query<number, number>({
+            query: (userId) => `users/${userId}/total-threads`,
+        }),
     }),
 });
 
@@ -27,6 +30,7 @@ export const {
     useGetThreadsQuery,
     useGetThreadQuery,
     useAddThreadMutation,
+    useTotalThreadsByUserQuery,
 } = threadApi;
 
 export default threadApi;

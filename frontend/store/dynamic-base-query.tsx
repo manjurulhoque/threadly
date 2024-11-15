@@ -2,16 +2,32 @@ import { getSession } from "next-auth/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const DynamicBaseQuery = async (args: any, api: any, extraOptions: any) => {
-    const session = await getSession();
-    return fetchBaseQuery({
-        baseUrl: 'http://localhost:8080/api',
-        prepareHeaders: (headers) => {
-            if (session?.access) {
-                headers.set('Authorization', `Bearer ${session.access}`);
-            }
-            return headers;
-        },
-    })(args, api, extraOptions);
+    try {
+        // Fetch the session for the current user
+        const session = await getSession();
+
+        // Initialize the base query with headers prepared
+        const baseQuery = fetchBaseQuery({
+            baseUrl: 'http://localhost:8080/api',
+            prepareHeaders: (headers) => {
+                if (session?.access) {
+                    headers.set('Authorization', `Bearer ${session.access}`);
+                }
+                return headers;
+            },
+        });
+
+        // Execute the base query
+        return baseQuery(args, api, extraOptions);
+    } catch (error) {
+        console.error("Failed to prepare dynamic base query:", error);
+        return {
+            error: {
+                status: "CUSTOM_ERROR",
+                message: "Failed to fetch user session or prepare headers.",
+            },
+        };
+    }
 };
 
 export default DynamicBaseQuery;
