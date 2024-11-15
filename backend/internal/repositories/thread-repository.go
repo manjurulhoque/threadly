@@ -7,7 +7,7 @@ import (
 
 type ThreadRepository interface {
 	CreateThread(thread *models.Thread) error
-	GetThreadsForUser(userId uint) ([]models.Thread, error)
+	GetThreadsForUser(userId uint) ([]models.ThreadWithLike, error)
 	GetThreadById(threadId uint) (*models.Thread, error)
 }
 
@@ -23,10 +23,19 @@ func (r *threadRepository) CreateThread(thread *models.Thread) error {
 	return r.db.Create(thread).Error
 }
 
-func (r *threadRepository) GetThreadsForUser(userId uint) ([]models.Thread, error) {
-	var threads []models.Thread
+func (r *threadRepository) GetThreadsForUser(userId uint) ([]models.ThreadWithLike, error) {
+	var threads []models.ThreadWithLike
 
 	err := r.db.
+		Select(`
+			threads.*,
+			EXISTS (
+				SELECT 1
+				FROM likes
+				WHERE likes.thread_id = threads.id
+				  AND likes.user_id = ?
+			) AS is_liked
+		`, userId).
 		Joins("LEFT JOIN follows f ON threads.user_id = f.followee_id").
 		Where("threads.user_id = ? OR f.follower_id = ?", userId, userId).
 		Preload("User").

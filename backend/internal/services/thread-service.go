@@ -7,7 +7,7 @@ import (
 
 type ThreadService interface {
 	CreateThread(thread models.Thread) error
-	GetThreadsForUser(userId uint) ([]models.Thread, error)
+	GetThreadsForUser(userId uint) ([]models.ThreadWithLike, error)
 	GetThreadById(threadId uint) (*models.Thread, error)
 }
 
@@ -23,7 +23,7 @@ func (s *threadService) CreateThread(thread models.Thread) error {
 	return s.threadRepo.CreateThread(&thread)
 }
 
-func (s *threadService) GetThreadsForUser(userId uint) ([]models.Thread, error) {
+func (s *threadService) GetThreadsForUser(userId uint) ([]models.ThreadWithLike, error) {
 	return s.threadRepo.GetThreadsForUser(userId)
 }
 

@@ -14,3 +14,13 @@ type Thread struct {
 func (t *Thread) TableName() string {
 	return "threads"
 }
+
+type ThreadWithLike struct {
+	Thread
+	IsLiked bool `json:"is_liked"`
+}
+
+// TableName overrides the table name
+func (t *ThreadWithLike) TableName() string {
+	return "threads"
+}
