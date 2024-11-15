@@ -93,6 +93,7 @@ func main() {
 		api.DELETE("/users/:id/unfollow", middlewares.AuthMiddleware(userRepo, userService), handlers.UnfollowUser)
 		api.GET("/users/:id/is-following", middlewares.AuthMiddleware(userRepo, userService), userHandler.IsFollowing)
 		api.GET("/users/:id/threads", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetThreadsForUser)
+		api.GET("/users/:id/replied-threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsUserReplied)
 	}
 
 	// run the server

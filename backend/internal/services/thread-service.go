@@ -10,6 +10,7 @@ type ThreadService interface {
 	GetThreadsForUser(userId uint) ([]models.ThreadWithLike, error)
 	GetThreadById(threadId uint) (*models.Thread, error)
 	TotalThreadsByUser(userId uint) (int64, error)
+	GetThreadsUserReplied(userId uint) ([]models.ThreadWithLike, error)
 }
 
 type threadService struct {
@@ -34,4 +35,8 @@ func (s *threadService) GetThreadById(threadId uint) (*models.Thread, error) {
 
 func (s *threadService) TotalThreadsByUser(userId uint) (int64, error) {
 	return s.threadRepo.TotalThreadsByUser(userId)
+}
+
+func (s *threadService) GetThreadsUserReplied(userId uint) ([]models.ThreadWithLike, error) {
+	return s.threadRepo.GetThreadsUserReplied(userId)
 }

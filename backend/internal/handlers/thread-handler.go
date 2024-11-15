@@ -87,3 +87,14 @@ func (h *ThreadHandler) TotalThreadsByUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"total": count})
 }
+
+func (h *ThreadHandler) GetThreadsUserReplied(c *gin.Context) {
+	userId := c.Param("id")
+	threads, err := h.threadService.GetThreadsUserReplied(utils.StringToUint(userId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"threads": threads})
+}
