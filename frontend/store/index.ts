@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import threadApi from "@/store/threads/threadApi";
 import commentApi from "@/store/comments/commentApi";
 import followApi from "@/store/follow/followApi";
+import likeApi from "@/store/likes/likeApi";
 
 
 export const store = configureStore({
@@ -9,10 +10,11 @@ export const store = configureStore({
         [threadApi.reducerPath]: threadApi.reducer,
         [commentApi.reducerPath]: commentApi.reducer,
         [followApi.reducerPath]: followApi.reducer,
+        [likeApi.reducerPath]: likeApi.reducer,
     },
     middleware: (getDefaultMiddleware: any) =>
         getDefaultMiddleware({}).concat(
-            threadApi.middleware, commentApi.middleware, followApi.middleware
+            threadApi.middleware, commentApi.middleware, followApi.middleware, likeApi.middleware
         ),
 })
 
