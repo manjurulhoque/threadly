@@ -77,6 +77,7 @@ func main() {
 		api.GET("/users/:id", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetUserById)
 		api.PUT("/users/update-profile", middlewares.AuthMiddleware(userRepo, userService), userHandler.UpdateUserProfile)
 		api.GET("/similar-minds", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetSimilarMinds)
+		api.GET("/users/:id/total-threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.TotalThreadsByUser)
 
 		api.POST("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
 		api.GET("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsForUser)

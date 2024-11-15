@@ -76,3 +76,19 @@ func (h *ThreadHandler) GetThreadById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"thread": thread})
 }
+
+func (h *ThreadHandler) TotalThreadsByUser(c *gin.Context) {
+	userId, exists := c.Get("id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	count, err := h.threadService.TotalThreadsByUser(userId.(uint))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"total": count})
+}
