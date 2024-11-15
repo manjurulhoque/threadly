@@ -42,14 +42,17 @@ func main() {
 	userRepo := repositories.NewUserRepository(db.DB)
 	threadRepo := repositories.NewThreadRepository(db.DB)
 	commentRepo := repositories.NewCommentRepository(db.DB)
+	likeRepo := repositories.NewLikeRepository(db.DB)
 
 	userService := services.NewUserService(userRepo)
 	threadService := services.NewThreadService(threadRepo)
 	commentService := services.NewCommentService(commentRepo)
+	likeService := services.NewLikeService(likeRepo)
 
 	userHandler := handlers.NewUserHandler(userService)
 	threadHandler := handlers.NewThreadHandler(threadService)
 	commentHandler := handlers.NewCommentHandler(commentService)
+	likeHandler := handlers.NewLikeHandler(likeService)
 
 	router.Static("/web/uploads", "./web/uploads")
 
@@ -81,6 +84,8 @@ func main() {
 
 		api.POST("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CreateComment)
 		api.GET("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CommentsByThreadId)
+
+		api.POST("/threads/:id/like", middlewares.AuthMiddleware(userRepo, userService), likeHandler.LikeThread)
 
 		api.POST("/users/:id/follow", middlewares.AuthMiddleware(userRepo, userService), handlers.FollowUser)
 		api.DELETE("/users/:id/unfollow", middlewares.AuthMiddleware(userRepo, userService), handlers.UnfollowUser)
