@@ -9,6 +9,7 @@ type ThreadRepository interface {
 	CreateThread(thread *models.Thread) error
 	GetThreadsForUser(userId uint) ([]models.ThreadWithLike, error)
 	GetThreadById(threadId uint) (*models.Thread, error)
+	TotalThreadsByUser(userId uint) (int64, error)
 }
 
 type threadRepository struct {
@@ -49,4 +50,10 @@ func (r *threadRepository) GetThreadById(threadId uint) (*models.Thread, error) 
 	var thread models.Thread
 	err := r.db.Where("id = ?", threadId).Preload("User").First(&thread).Error
 	return &thread, err
+}
+
+func (r *threadRepository) TotalThreadsByUser(userId uint) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Thread{}).Where("user_id = ?", userId).Count(&count).Error
+	return count, err
 }
