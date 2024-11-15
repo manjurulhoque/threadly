@@ -17,12 +17,16 @@ function ThreadCard({ thread }: Props) {
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
     const onClickHeart = () => {
-        likeThread(id).unwrap().then(() => {
-            toast.success("Thread liked successfully");
-        }).catch((error) => {
-            console.error(error);
-            toast.error("Failed to like thread");
-        });
+        if (!is_liked) {
+            likeThread(id).unwrap().then(() => {
+                toast.success("Thread liked successfully");
+                is_liked = !is_liked;
+            }).catch((error) => {
+                console.error(error);
+                toast.error("Failed to like thread");
+            });
+        } else {
+        }
     }
 
     return (

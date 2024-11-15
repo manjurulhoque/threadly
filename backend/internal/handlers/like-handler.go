@@ -46,3 +46,29 @@ func (h *LikeHandler) LikeThread(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Thread liked"})
 }
+
+// UnlikeThread Unlike thread handler
+func (h *LikeHandler) UnlikeThread(c *gin.Context) {
+	userId, _ := c.Get("userId")
+	threadId, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread id"})
+		return
+	}
+
+	// Check if the user is already liked the thread
+	var existingLike models.Like
+	if err := h.likeService.GetLikeByUserAndThread(userId.(uint), uint(threadId), &existingLike); err != nil {
+		// Record does not exist, meaning the user has not liked the thread
+		c.JSON(http.StatusConflict, gin.H{"error": "You have not liked this thread"})
+		return
+	}
+
+	err = h.likeService.UnlikeThread(&existingLike)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Thread unliked"})
+}
