@@ -1,16 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Thread } from "@/types/thread.type";
+import { useLikeThreadMutation } from "@/store/likes/likeApi";
+import { toast } from "react-toastify";
 
 interface Props {
     thread: Thread;
 }
 
-function ThreadCard({thread}: Props) {
+function ThreadCard({ thread }: Props) {
     let isComment = false;
-    let {id, content, user} = thread;
+    let { id, content, user } = thread;
+    const [ likeThread, { isLoading } ] = useLikeThreadMutation();
 
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
+
+    const onClickHeart = () => {
+        likeThread(id).unwrap().then(() => {
+            toast.success("Thread liked successfully");
+        }).catch((error) => {
+            console.error(error);
+            toast.error("Failed to like thread");
+        });
+    }
 
     return (
         <article className={`flex w-full flex-col rounded-xl bg-light-2 dark:bg-dark-2 p-7 shadow-md dark:shadow-none`}>
@@ -19,7 +33,8 @@ function ThreadCard({thread}: Props) {
                     <div className='flex flex-col items-center'>
                         <Link href={`/profile/${user.id}`} className='relative h-11 w-11'>
                             {userImage === "" ? (
-                                <div className="relative w-10 h-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
+                                <div
+                                    className="relative w-10 h-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
                                     <svg
                                         className="absolute w-12 h-12 -left-1 text-gray-400 dark:text-gray-300"
                                         fill="currentColor"
@@ -66,6 +81,7 @@ function ThreadCard({thread}: Props) {
                                     width={24}
                                     height={24}
                                     className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
+                                    onClick={onClickHeart}
                                 />
                                 <Link href={`/thread/${id}`}>
                                     <Image

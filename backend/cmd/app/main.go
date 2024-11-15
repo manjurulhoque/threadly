@@ -27,7 +27,7 @@ func init() {
 		panic(err)
 	}
 
-	err = db.DB.AutoMigrate(&models.User{}, &models.Community{}, &models.Thread{}, &models.Comment{}, &models.Follow{})
+	err = db.DB.AutoMigrate(&models.User{}, &models.Community{}, &models.Thread{}, &models.Comment{}, &models.Follow{}, &models.Like{})
 	if err != nil {
 		slog.Error("Error migrating database", "error", err.Error())
 		panic(fmt.Sprintf("Error migrating database: %v", err))

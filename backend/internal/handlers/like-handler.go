@@ -19,7 +19,7 @@ func NewLikeHandler(likeService services.LikeService) *LikeHandler {
 // LikeThread Like thread handler
 func (h *LikeHandler) LikeThread(c *gin.Context) {
 	userId, _ := c.Get("userId")
-	threadId, err := strconv.ParseUint(c.Param("threadId"), 10, 64)
+	threadId, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid thread id"})
 		return

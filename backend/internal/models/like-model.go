@@ -6,8 +6,8 @@ type Like struct {
 	ThreadId uint `json:"thread_id" gorm:"not null"` // Thread being liked
 
 	// Associations
-	User   User   `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-	Thread Thread `json:"thread" gorm:"foreignKey:ThreadID;constraint:OnDelete:CASCADE"`
+	User   User   `json:"user" gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE"`
+	Thread Thread `json:"thread" gorm:"foreignKey:ThreadId;constraint:OnDelete:CASCADE"`
 }
 
 func (l *Like) TableName() string {
