@@ -28,5 +28,5 @@ func (r *likeRepository) GetLikeByUserAndThread(userId, threadId uint, like *mod
 }
 
 func (r *likeRepository) UnlikeThread(like *models.Like) error {
-	return r.db.Delete(like).Error
+	return r.db.Unscoped().Delete(like).Error
 }

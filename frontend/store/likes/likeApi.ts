@@ -15,7 +15,7 @@ export const likeApi = createApi({
         }),
         unlikeThread: builder.mutation<void, void>({
             query: (threadId: number) => ({
-                url: `threads/${threadId}/like`,
+                url: `threads/${threadId}/unlike`,
                 method: 'DELETE',
             }),
             invalidatesTags: [ 'Like' ],

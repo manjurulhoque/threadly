@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Thread } from "@/types/thread.type";
-import { useLikeThreadMutation } from "@/store/likes/likeApi";
+import { useLikeThreadMutation, useUnlikeThreadMutation } from "@/store/likes/likeApi";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 interface Props {
     thread: Thread;
@@ -12,22 +13,37 @@ interface Props {
 
 function ThreadCard({ thread }: Props) {
     let { id, content, user, is_liked } = thread;
-    const [ likeThread, { isLoading } ] = useLikeThreadMutation();
+    const [likeThread, { isLoading: isLiking }] = useLikeThreadMutation();
+    const [unlikeThread, { isLoading: isUnliking }] = useUnlikeThreadMutation();
+    const [ isLiked, setIsLiked ] = useState(is_liked); // Initialize directly from `is_liked`
 
     let userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
-    const onClickHeart = () => {
-        if (!is_liked) {
-            likeThread(id).unwrap().then(() => {
-                toast.success("Thread liked successfully");
-                is_liked = !is_liked;
-            }).catch((error) => {
-                console.error(error);
-                toast.error("Failed to like thread");
-            });
+    const handleLikeToggle = () => {
+        if (!isLiked) {
+            likeThread(id)
+                .unwrap()
+                .then(() => {
+                    toast.success("Thread liked successfully");
+                    setIsLiked(true);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    toast.error("Failed to like thread");
+                });
         } else {
+            unlikeThread(id)
+                .unwrap()
+                .then(() => {
+                    toast.success("Thread unliked successfully");
+                    setIsLiked(false);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    toast.error("Failed to unlike thread");
+                });
         }
-    }
+    };
 
     return (
         <article className={`flex w-full flex-col rounded-xl bg-light-2 dark:bg-dark-2 p-7 shadow-md dark:shadow-none`}>
@@ -79,14 +95,14 @@ function ThreadCard({ thread }: Props) {
                         <div className={`mt-5 flex flex-col gap-3`}>
                             <div className='flex gap-3.5'>
                                 {
-                                    is_liked ? (
+                                    isLiked ? (
                                         <Image
                                             src='/assets/heart-filled.svg'
                                             alt='heart'
                                             width={24}
                                             height={24}
                                             className='cursor-pointer object-contain dark:brightness-300'
-                                            onClick={onClickHeart}
+                                            onClick={handleLikeToggle}
                                         />
                                     ) : (
                                         <Image
@@ -95,7 +111,7 @@ function ThreadCard({ thread }: Props) {
                                             width={24}
                                             height={24}
                                             className='cursor-pointer object-contain dark:invert-[0.95] dark:brightness-200'
-                                            onClick={onClickHeart}
+                                            onClick={handleLikeToggle}
                                         />
                                     )
                                 }
