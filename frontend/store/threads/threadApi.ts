@@ -28,7 +28,10 @@ const threadApi = createApi({
         }),
         getRepliedThreadsByUser: builder.query<Thread[], number>({
             query: (userId) => `users/${userId}/replied-threads`,
-        })
+        }),
+        getMentionedThreadsByUser: builder.query<Thread[], number>({
+            query: (userId) => `users/${userId}/mentioned-threads`,
+        }),
     }),
 });
 
@@ -39,6 +42,7 @@ export const {
     useTotalThreadsByUserQuery,
     useGetThreadsByUserQuery,
     useGetRepliedThreadsByUserQuery,
+    useGetMentionedThreadsByUserQuery,
 } = threadApi;
 
 export default threadApi;
