@@ -145,3 +145,14 @@ func (h *ThreadHandler) GetThreadsUserReplied(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"threads": threads})
 }
+
+func (h *ThreadHandler) GetThreadsWhereUserWasMentioned(c *gin.Context) {
+	userId := c.Param("id")
+	threads, err := h.threadService.GetThreadsWhereUserWasMentioned(utils.StringToUint(userId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"threads": threads})
+}
