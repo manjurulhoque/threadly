@@ -11,7 +11,7 @@ type ThreadRepository interface {
 	GetThreadById(threadId uint) (*models.Thread, error)
 	TotalThreadsByUser(userId uint) (int64, error)
 	GetThreadsUserReplied(userId uint) ([]models.ThreadWithLike, error)
-	GetThreadsWhereUserWasMentioned(userId uint) ([]models.ThreadWithLike, error)
+	GetThreadsWhereUserWasMentioned(uint, uint) ([]models.ThreadWithLike, error)
 }
 
 type threadRepository struct {
@@ -83,7 +83,7 @@ func (r *threadRepository) GetThreadsUserReplied(userId uint) ([]models.ThreadWi
 	return threads, err
 }
 
-func (r *threadRepository) GetThreadsWhereUserWasMentioned(userId uint) ([]models.ThreadWithLike, error) {
+func (r *threadRepository) GetThreadsWhereUserWasMentioned(userId, currentUserId uint) ([]models.ThreadWithLike, error) {
 	var threads []models.ThreadWithLike
 
 	err := r.db.
@@ -95,10 +95,9 @@ func (r *threadRepository) GetThreadsWhereUserWasMentioned(userId uint) ([]model
 				WHERE likes.thread_id = threads.id
 				  AND likes.user_id = ?
 			) AS is_liked
-		`, userId).
+		`, currentUserId).
 		Joins("JOIN mentions ON threads.id = mentions.thread_id").
 		Where("mentions.user_id = ?", userId).
-		Distinct("threads.id, threads.content, threads.user_id, threads.created_at").
 		Preload("User").
 		Order("threads.created_at DESC").
 		Find(&threads).Error

@@ -155,7 +155,8 @@ func (h *ThreadHandler) GetThreadsUserReplied(c *gin.Context) {
 
 func (h *ThreadHandler) GetThreadsWhereUserWasMentioned(c *gin.Context) {
 	userId := c.Param("id")
-	threads, err := h.threadService.GetThreadsWhereUserWasMentioned(utils.StringToUint(userId))
+	currentUserId, _ := c.Get("userId")
+	threads, err := h.threadService.GetThreadsWhereUserWasMentioned(utils.StringToUint(userId), currentUserId.(uint))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -13,7 +13,7 @@ type ThreadService interface {
 	GetThreadById(threadId uint) (*models.Thread, error)
 	TotalThreadsByUser(userId uint) (int64, error)
 	GetThreadsUserReplied(userId uint) ([]models.ThreadWithLike, error)
-	GetThreadsWhereUserWasMentioned(userId uint) ([]models.ThreadWithLike, error)
+	GetThreadsWhereUserWasMentioned(uint, uint) ([]models.ThreadWithLike, error)
 }
 
 type threadService struct {
@@ -52,8 +52,8 @@ func (s *threadService) GetThreadsUserReplied(userId uint) ([]models.ThreadWithL
 	return s.threadRepo.GetThreadsUserReplied(userId)
 }
 
-func (s *threadService) GetThreadsWhereUserWasMentioned(userId uint) ([]models.ThreadWithLike, error) {
-	threads, err := s.threadRepo.GetThreadsWhereUserWasMentioned(userId)
+func (s *threadService) GetThreadsWhereUserWasMentioned(userId, currentUserId uint) ([]models.ThreadWithLike, error) {
+	threads, err := s.threadRepo.GetThreadsWhereUserWasMentioned(userId, currentUserId)
 	if err != nil {
 		slog.Error("Failed to get threads where user was mentioned", "error", err.Error())
 		return nil, fmt.Errorf("failed to get threads where user was mentioned: %w", err)
