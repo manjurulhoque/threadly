@@ -120,7 +120,7 @@
 
 /* Tab */
 .tab {
-    @apply flex min-h-[50px] flex-1 items-center gap-3 bg-light-2 dark:bg-dark-2 text-dark-1 dark:text-light-2 data-[state=active]:bg-light-3 dark:data-[state=active]:bg-[#0e0e12] data-[state=active]:text-dark-1 dark:data-[state=active]:text-light-2 !important;
+    @apply flex min-h-[50px] flex-1 items-center gap-3 bg-light-2 dark:bg-dark-2 text-dark-1 dark:text-light-2 data-[state=active]:bg-light-3 dark:data-[state=active]:bg-[#0e0e12] data-[state=active]:text-light-1 dark:data-[state=active]:text-light-2 !important;
 }
 
 .no-focus {

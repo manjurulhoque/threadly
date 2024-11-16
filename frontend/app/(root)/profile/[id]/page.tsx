@@ -12,6 +12,7 @@ import { authOptions } from "@/lib/authOptions";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { fetchTotalThreadsByUser } from "@/lib/actions/thread.actions";
 import RepliedThreadsTab from "@/components/shared/RepliedThreadsTab";
+import MentionedThreadsTab from "@/components/shared/MentionedThreadsTab";
 
 export const metadata = async ({ params }: { params: { id: number } }) => {
     if (!params?.id) {
@@ -106,7 +107,7 @@ async function Page({ params }: { params: { id: number } }) {
                         className='w-full text-light-1'
                     >
                         {/* @ts-ignore */}
-                        <ThreadsTab userId={params.id} />
+                        <MentionedThreadsTab userId={params.id} />
                     </TabsContent>
                 </Tabs>
             </div>
