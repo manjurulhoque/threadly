@@ -120,6 +120,8 @@ func (h *ThreadHandler) GetThreadById(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	// Format content for each thread
+	thread.Content = utils.FormatThreadContent(thread.Content)
 
 	c.JSON(http.StatusOK, gin.H{"thread": thread})
 }
@@ -143,6 +145,11 @@ func (h *ThreadHandler) GetThreadsUserReplied(c *gin.Context) {
 		return
 	}
 
+	// Format content for each thread
+	for i := range threads {
+		threads[i].Content = utils.FormatThreadContent(threads[i].Content)
+	}
+
 	c.JSON(http.StatusOK, gin.H{"threads": threads})
 }
 
@@ -152,6 +159,11 @@ func (h *ThreadHandler) GetThreadsWhereUserWasMentioned(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Format content for each thread
+	for i := range threads {
+		threads[i].Content = utils.FormatThreadContent(threads[i].Content)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"threads": threads})
