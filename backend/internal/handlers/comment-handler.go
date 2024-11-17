@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -82,6 +83,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 			Type:      models.NotificationTypeComment,
 			ThreadId:  &comment.ThreadId,
 			CommentId: &comment.ID,
+			Url:       fmt.Sprintf("/threads/%s", threadId),
 		}
 
 		if err := h.notificationService.CreateNotification(notification); err != nil {
