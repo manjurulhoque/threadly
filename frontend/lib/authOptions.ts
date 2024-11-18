@@ -1,11 +1,11 @@
-import { AuthOptions, User } from "next-auth";
+import { AuthOptions, Session, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { DecodedJWT } from "next-auth/jwt";
 import { jwtDecode } from "jwt-decode";
 
 async function customAuthenticationFunction(credentials: any) {
     try {
-        // Call your FastAPI endpoint for user authentication
+        // Call your login endpoint for user authentication
         const response = await fetch(`${process.env.BACKEND_BASE_URL}/api/login`, {
             method: "POST",
             headers: {
@@ -40,22 +40,15 @@ export const authOptions: AuthOptions = {
                 const result = await customAuthenticationFunction(credentials);
 
                 if (result) {
-                    const {
-                        user_id,
-                        email,
-                        is_admin,
-                        name,
-                        exp,
-                    }: DecodedJWT = jwtDecode(result.access);
-
+                    const decoded: DecodedJWT = jwtDecode(result.access);
                     const user = {
                         ...result,
-                        exp,
+                        exp: decoded.exp,
                         user: {
-                            id: user_id,
-                            email,
-                            is_admin,
-                            name
+                            id: decoded.user_id?.toString(),
+                            email: decoded.email,
+                            is_admin: decoded.is_admin,
+                            name: decoded.name
                         },
                     } as User;
 
@@ -82,16 +75,16 @@ export const authOptions: AuthOptions = {
             }
             return token;
         },
-        async session({session, token, user}) {
+        async session({session, token}) {
             const currentTime = Math.floor(Date.now() / 1000);
             if (token.exp && token.exp < currentTime) {
-                return null; // Token expired, return null to force sign out
+                // Return an empty session to force a logout
+                return {} as Session;
             }
             session.access = token.access;
             session.exp = token.exp;
             session.refresh = token.refresh;
             session.user = token.user;
-            // session.user.id = token.id;
             if (token?.user?.is_admin) {
                 session.user.is_admin = token.user.is_admin;
             }
@@ -109,6 +102,6 @@ export const authOptions: AuthOptions = {
     debug: true,
     session: {
         strategy: "jwt",
-        maxAge:  60 * 60, // 1 hour
+        maxAge:  60 * 60 * 24 * 7, // 7 days
     },
 };

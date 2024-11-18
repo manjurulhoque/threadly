@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Message } from "@/types/message.type";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 interface ChatWindowProps {
     isOpen: boolean;
@@ -27,20 +28,22 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
     const { data, isLoading: messagesLoading } = useGetMessagesQuery({receiverId: receiverUser?.id, page: 1, limit: 20});
     const previousMessages = data?.messages ?? [];
     
-    const socketUrl = "ws://localhost:8080/ws";
-    const { sendJsonMessage } = useWebSocket(socketUrl, {
-        onMessage: (event) => {
-            const message = JSON.parse(event.data);
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                content: message.content,
-                created_at: new Date().toISOString(),
-                sender_id: message.sender_id,
-                receiver_id: message.receiver_id
-            }]);
-        },
-        shouldReconnect: (closeEvent) => true,
-    });
+    const { sendMessage, lastMessage } = useWebSocketContext();
+
+    useEffect(() => {
+        if (lastMessage) {
+            const message = JSON.parse(lastMessage.data);
+            if (message.type === "message") {
+                setMessages(prev => [...prev, {
+                    id: Date.now(),
+                    content: message.content,
+                    created_at: new Date().toISOString(),
+                    sender_id: message.sender_id,
+                    receiver_id: message.receiver_id
+                }]);
+            }
+        }
+    }, [lastMessage]);
 
     useEffect(() => {
         if (messagesRef.current) {
@@ -74,15 +77,7 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
             content,
         };
 
-        sendJsonMessage(message);
-        
-        // setMessages(prev => [...prev, {
-        //     id: Date.now(),
-        //     content,
-        //     created_at: new Date().toISOString(),
-        //     sender_id: parseInt(session.user.id!),
-        //     receiver_id: receiverUser.id
-        // }]);
+        sendMessage(message);
 
         // Clear the input
         event.currentTarget.value = '';

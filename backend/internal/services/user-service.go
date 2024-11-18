@@ -13,8 +13,8 @@ import (
 
 // Define constants for token expiration
 const (
-	accessTokenExpiry  = time.Minute * 60
-	refreshTokenExpiry = time.Hour * 24 * 7
+	accessTokenExpiry  = time.Hour * 24 * 7
+	refreshTokenExpiry = time.Hour * 24 * 30
 )
 
 type UserService interface {

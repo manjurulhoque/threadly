@@ -47,6 +47,7 @@ declare module 'next-auth/jwt' {
     }
 
     export interface DecodedJWT extends UserObject {
+        user_id: string | number;
         exp: number;
         iat: number;
         jti: string;
