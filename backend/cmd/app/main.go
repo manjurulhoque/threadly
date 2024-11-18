@@ -43,16 +43,19 @@ func main() {
 	router := gin.Default()
 	defer db.CloseDB(db.DB)
 
+	// Initialize repositories with pointer receivers
 	userRepo := repositories.NewUserRepository(db.DB)
 	threadRepo := repositories.NewThreadRepository(db.DB)
 	commentRepo := repositories.NewCommentRepository(db.DB)
 	likeRepo := repositories.NewLikeRepository(db.DB)
 
+	// Initialize services with pointer receivers
 	userService := services.NewUserService(userRepo)
 	threadService := services.NewThreadService(threadRepo)
 	commentService := services.NewCommentService(commentRepo)
 	likeService := services.NewLikeService(likeRepo)
 
+	// Initialize handlers with pointer receivers
 	userHandler := handlers.NewUserHandler(userService)
 	threadHandler := handlers.NewThreadHandler(threadService)
 	commentHandler := handlers.NewCommentHandler(commentService)
@@ -68,49 +71,60 @@ func main() {
 	// Set the user repository in the utils package
 	utils.SetUserRepo(userRepo)
 
-	// Updated CORS configuration
-	router.Use(cors.New(cors.Config{
+	// CORS configuration - using a single config instance
+	corsConfig := cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
-	}))
+	}
+	router.Use(cors.New(corsConfig))
 	router.GET("/ws", handlers.HandleConnections)
 
+	// Group API routes for better organization and middleware reuse
 	api := router.Group("/api")
+	authMiddleware := middlewares.AuthMiddleware(userRepo, userService)
 	{
+		// Auth routes
 		api.POST("/register", userHandler.Register)
 		api.POST("/login", userHandler.Login)
 		api.POST("/token/refresh", userHandler.Refresh)
-		api.GET("/users/:id", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetUserById)
-		api.PUT("/users/update-profile", middlewares.AuthMiddleware(userRepo, userService), userHandler.UpdateUserProfile)
-		api.GET("/similar-minds", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetSimilarMinds)
-		api.GET("/users/:id/total-threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.TotalThreadsByUser)
 
-		api.POST("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.CreateThread)
-		api.GET("/threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsForUser)
-		api.GET("/threads/:id", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadById)
+		// User routes with auth
+		api.GET("/users/:id", authMiddleware, userHandler.GetUserById)
+		api.PUT("/users/update-profile", authMiddleware, userHandler.UpdateUserProfile)
+		api.GET("/similar-minds", authMiddleware, userHandler.GetSimilarMinds)
+		api.GET("/users/:id/total-threads", authMiddleware, threadHandler.TotalThreadsByUser)
 
-		api.POST("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CreateComment)
-		api.GET("/threads/:id/comments", middlewares.AuthMiddleware(userRepo, userService), commentHandler.CommentsByThreadId)
+		// Thread routes with auth
+		api.POST("/threads", authMiddleware, threadHandler.CreateThread)
+		api.GET("/threads", authMiddleware, threadHandler.GetThreadsForUser)
+		api.GET("/threads/:id", authMiddleware, threadHandler.GetThreadById)
 
-		api.POST("/threads/:id/like", middlewares.AuthMiddleware(userRepo, userService), likeHandler.LikeThread)
-		api.DELETE("/threads/:id/unlike", middlewares.AuthMiddleware(userRepo, userService), likeHandler.UnlikeThread)
+		// Comment routes with auth
+		api.POST("/threads/:id/comments", authMiddleware, commentHandler.CreateComment)
+		api.GET("/threads/:id/comments", authMiddleware, commentHandler.CommentsByThreadId)
 
-		api.POST("/users/:id/follow", middlewares.AuthMiddleware(userRepo, userService), handlers.FollowUser)
-		api.DELETE("/users/:id/unfollow", middlewares.AuthMiddleware(userRepo, userService), handlers.UnfollowUser)
-		api.GET("/users/:id/is-following", middlewares.AuthMiddleware(userRepo, userService), userHandler.IsFollowing)
-		api.GET("/users/:id/threads", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetThreadsForUser)
-		api.GET("/users/:id/replied-threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsUserReplied)
-		api.GET("/users/:id/mentioned-threads", middlewares.AuthMiddleware(userRepo, userService), threadHandler.GetThreadsWhereUserWasMentioned)
-		api.GET("/user-suggestions", middlewares.AuthMiddleware(userRepo, userService), userHandler.GetUserSuggestions)
+		// Like routes with auth
+		api.POST("/threads/:id/like", authMiddleware, likeHandler.LikeThread)
+		api.DELETE("/threads/:id/unlike", authMiddleware, likeHandler.UnlikeThread)
+
+		// Follow/Unfollow routes with auth
+		api.POST("/users/:id/follow", authMiddleware, handlers.FollowUser)
+		api.DELETE("/users/:id/unfollow", authMiddleware, handlers.UnfollowUser)
+		api.GET("/users/:id/is-following", authMiddleware, userHandler.IsFollowing)
+
+		// User content routes with auth
+		api.GET("/users/:id/threads", authMiddleware, userHandler.GetThreadsForUser)
+		api.GET("/users/:id/replied-threads", authMiddleware, threadHandler.GetThreadsUserReplied)
+		api.GET("/users/:id/mentioned-threads", authMiddleware, threadHandler.GetThreadsWhereUserWasMentioned)
+		api.GET("/user-suggestions", authMiddleware, userHandler.GetUserSuggestions)
 	}
 
 	// run the server
-	err := router.Run()
-	if err != nil {
+	if err := router.Run(); err != nil {
 		slog.Error("Failed to start server", "error", err.Error())
 		panic(err)
 	}

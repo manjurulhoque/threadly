@@ -4,10 +4,16 @@ import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage, } from "@/components/u
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { Button } from "@/components/ui/button";
-import { Mic, Paperclip, } from "lucide-react";
+import { Mic, Paperclip, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useWebSocket from "react-use-websocket";
+
+interface User {
+    id: number;
+    name: string;
+    avatar: string;
+}
 
 const users = [
     { id: 1, name: "Alice", avatar: "/images/avatar1.png" },
@@ -15,8 +21,13 @@ const users = [
     { id: 3, name: "Charlie", avatar: "/images/avatar3.png" },
 ];
 
+interface Message {
+    role: 'user' | 'assistant';
+    content: string;
+}
+
 export default function ChatMessage() {
-    const [ activeUser, setActiveUser ] = useState(null);
+    const [ activeUser, setActiveUser ] = useState<User | null>(null);
     const socketUrl = "ws://localhost:8080/ws";
     const { sendMessage, sendJsonMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
         onMessage: (event) => {
@@ -25,7 +36,7 @@ export default function ChatMessage() {
         },
         shouldReconnect: (closeEvent) => true,
     });
-    let messages = [];
+    const [messages, setMessages] = useState<Message[]>([]);
 
     const messagesRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -63,17 +74,18 @@ export default function ChatMessage() {
         }
     };
 
+
     return (
-        <main className="flex h-[800px] w-full">
+        <main className="flex h-[800px] w-full border dark:border-gray-700">
             {/* Left Sidebar */}
-            <div className="w-1/4 bg-black dark:bg-gray-600 border-r p-4">
-                <h2 className="text-xl font-bold mb-4">Users</h2>
+            <div className="w-1/4 bg-background border-r p-4 shadow-lg dark:border-gray-700">
+                <h2 className="text-xl font-bold mb-4 text-foreground">Users</h2>
                 <ul className="space-y-4">
                     {users.map((user) => (
                         <li
                             key={user.id}
                             className={`flex items-center space-x-3 cursor-pointer p-2 rounded-md ${
-                                activeUser?.id === user.id ? "bg-gray-200" : "hover:bg-gray-200"
+                                activeUser?.id === user.id ? "bg-muted" : "hover:bg-muted"
                             }`}
                             onClick={() => setActiveUser(user)}
                         >
@@ -81,28 +93,25 @@ export default function ChatMessage() {
                                 <AvatarImage src={user.avatar} alt={user.name}/>
                                 <AvatarFallback>{user.name[0]}</AvatarFallback>
                             </Avatar>
-                            <span className={`font-medium ${
-                                activeUser?.id === user.id ? "text-black dark:text-black" : "text-light-1 dark:text-light-2"
-                            }`}>{user.name}</span>
+                            <span className={`font-medium text-foreground`}>{user.name}</span>
                         </li>
                     ))}
                 </ul>
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col border border-gray-200 dark:border-gray-700 shadow-xl">
                 {activeUser ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-4 bg-gray-50 border-b bg-black dark:bg-gray-600">
-                            <h2 className="text-lg font-semibold text-light-2 dark:text-light-1">Chat
-                                with {activeUser.name}</h2>
+                        <div className="p-4 bg-primary-500 border-b dark:border-gray-700">
+                            <h2 className="text-lg font-semibold text-foreground">Chat with {activeUser.name}</h2>
                         </div>
 
                         {/* Messages */}
                         <ChatMessageList ref={messagesRef} className="flex-1 overflow-y-auto p-4">
                             {messages.length === 0 && (
-                                <div className="flex items-center justify-center h-full text-gray-500">
+                                <div className="flex items-center justify-center h-full text-muted-foreground">
                                     Start chatting with {activeUser.name}!
                                 </div>
                             )}
@@ -137,18 +146,29 @@ export default function ChatMessage() {
                         </ChatMessageList>
 
                         {/* Chat Input */}
-                        <div className="p-4 border-t">
+                        <div className="p-4 border-t dark:border-gray-700">
                             <form
                                 ref={formRef}
                                 onSubmit={onSubmit}
-                                className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+                                className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring dark:border-gray-700"
                             >
-                                <ChatInput
-                                    onKeyDown={onKeyDown}
-                                    placeholder={`Message ${activeUser.name}`}
-                                    className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
-                                    name="content"
-                                />
+                                <div className="flex">
+                                    <ChatInput
+                                        onKeyDown={onKeyDown}
+                                        placeholder={`Message ${activeUser.name}`}
+                                        className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0 flex-1"
+                                        name="content"
+                                    />
+                                    <Button 
+                                        type="submit"
+                                        variant="ghost" 
+                                        size="icon"
+                                        className="mr-2"
+                                    >
+                                        <Send className="size-4"/>
+                                        <span className="sr-only">Send message</span>
+                                    </Button>
+                                </div>
                                 <div className="flex items-center p-3 pt-0">
                                     <Button variant="ghost" size="icon">
                                         <Paperclip className="size-4"/>
@@ -159,22 +179,13 @@ export default function ChatMessage() {
                                         <Mic className="size-4"/>
                                         <span className="sr-only">Use Microphone</span>
                                     </Button>
-
-                                    {/*<Button*/}
-                                    {/*    type="submit"*/}
-                                    {/*    size="sm"*/}
-                                    {/*    className="ml-auto gap-1.5"*/}
-                                    {/*>*/}
-                                    {/*    Send Message*/}
-                                    {/*    <CornerDownLeft className="size-3.5" />*/}
-                                    {/*</Button>*/}
                                 </div>
                             </form>
                         </div>
                     </>
                 ) : (
                     <div className="flex flex-col items-center justify-center flex-1">
-                        <p className="text-gray-500">Select a user to start chatting.</p>
+                        <p className="text-muted-foreground">Select a user to start chatting.</p>
                     </div>
                 )}
             </div>
