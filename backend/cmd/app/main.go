@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
+	"sync"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/config"
@@ -12,8 +16,6 @@ import (
 	"github.com/manjurulhoque/threadly/backend/internal/repositories"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
 	"github.com/manjurulhoque/threadly/backend/pkg/utils"
-	"log/slog"
-	"time"
 )
 
 func init() {
@@ -56,6 +58,11 @@ func main() {
 	commentHandler := handlers.NewCommentHandler(commentService)
 	likeHandler := handlers.NewLikeHandler(likeService)
 
+	// Set up WebSocket message handler
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go handlers.HandleMessages(db.DB, &wg)
+
 	router.Static("/web/uploads", "./web/uploads")
 
 	// Set the user repository in the utils package
@@ -70,6 +77,7 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+	router.GET("/ws", handlers.HandleConnections)
 
 	api := router.Group("/api")
 	{
@@ -106,4 +114,6 @@ func main() {
 		slog.Error("Failed to start server", "error", err.Error())
 		panic(err)
 	}
+
+	wg.Wait() // Wait for all goroutines to finish (e.g., HandleMessages)
 }

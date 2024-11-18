@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.1",
     "@reduxjs/toolkit": "^2.3.0",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
@@ -25,6 +26,7 @@
     "react-mentions": "^4.4.10",
     "react-redux": "^9.1.2",
     "react-toastify": "^10.0.6",
+    "react-use-websocket": "^4.10.1",
     "tailwind-merge": "^2.5.4",
     "zod": "^3.23.8"
   },
