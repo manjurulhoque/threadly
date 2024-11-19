@@ -8,28 +8,41 @@ import { Mic, Paperclip, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useWebSocket from "react-use-websocket";
-import { useGetChatUsersQuery } from "@/store/users/userApi";
+import { useGetChatUsersQuery, useGetMessagesQuery } from "@/store/users/userApi";
 import { User } from "@/types/user.type";
-
-interface Message {
-    role: 'user' | 'assistant';
-    content: string;
-}
+import { Message } from "@/types/message.type";
+import { useSession } from "next-auth/react";
 
 
 export default function ChatMessage() {
+    const { data: session } = useSession();
+    const currentUser = session?.user;
     const [ activeUser, setActiveUser ] = useState<User | null>(null);
     const socketUrl = "ws://localhost:8080/ws";
     const { sendMessage, sendJsonMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
         onMessage: (event) => {
-            console.log(event.data);
-            // setMessages((messages) => [ ...messages, data]);
+            const message = JSON.parse(event.data);
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                content: message.content,
+                created_at: new Date().toISOString(),
+                sender_id: message.sender_id,
+                receiver_id: message.receiver_id
+            }]);
         },
         shouldReconnect: (closeEvent) => true,
     });
     const [messages, setMessages] = useState<Message[]>([]);
-    const { data, isLoading: chatUsersLoading, error: chatUsersError } = useGetChatUsersQuery();
-    const users = data?.users ?? [];
+    const { data: chatUsersData, isLoading: chatUsersLoading, error: chatUsersError } = useGetChatUsersQuery();
+    const users = chatUsersData?.users ?? [];
+
+    const { 
+        data: messagesData, 
+        isLoading: messagesLoading 
+    } = useGetMessagesQuery(
+        { receiverId: activeUser?.id ?? 0, page: 1, limit: 20 },
+        { skip: !activeUser }
+    );
 
     const messagesRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -40,33 +53,56 @@ export default function ChatMessage() {
         }
     }, [ messages ]);
 
+    useEffect(() => {
+        if (activeUser && messagesData?.messages) {
+            setMessages(messagesData.messages);
+        }
+    }, [activeUser, messagesData]);
+
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const content = (e.target as HTMLFormElement).value;
+        const formData = new FormData(e.currentTarget);
+        const content = formData.get('content') as string;
+
+        if (!content.trim() || !currentUser?.id) return;
 
         const message = {
-            sender_id: 1, // Replace with actual sender ID
-            receiver_id: 2, // Replace with actual receiver ID
-            content,
+            sender_id: parseInt(currentUser.id),
+            receiver_id: activeUser?.id,
+            content: content.trim(),
         };
 
         // Send JSON message
         sendJsonMessage(message);
 
         // Clear the form input
-        // (e.target as HTMLFormElement).reset();
+        e.currentTarget.reset();
     };
 
-
     const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            onSubmit(e as unknown as React.FormEvent<HTMLFormElement>).then(() => {
-                console.log("Message sent");
-            });
+            const content = e.currentTarget.value;
+
+            if (!content.trim() || !currentUser?.id) return;
+
+            const message = {
+                sender_id: parseInt(currentUser.id),
+                receiver_id: activeUser?.id,
+                content: content.trim(),
+            };
+
+            // Send JSON message
+            sendJsonMessage(message);
+
+            // Clear the input
+            e.currentTarget.value = '';
         }
     };
 
+    const getUserImage = (user: User) => {
+        return user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+    };
 
     return (
         <main className="flex h-[800px] w-full border dark:border-gray-700">
@@ -94,7 +130,7 @@ export default function ChatMessage() {
                                 onClick={() => setActiveUser(user)}
                             >
                                 <Avatar>
-                                    <AvatarImage src={user.image} alt={user.name}/>
+                                    <AvatarImage src={getUserImage(user)} alt={user.name}/>
                                     <AvatarFallback>{user.name[0]}</AvatarFallback>
                                 </Avatar>
                                 <span className={`font-medium text-foreground`}>{user.name}</span>
@@ -123,11 +159,11 @@ export default function ChatMessage() {
                             {messages.map((message, index) => (
                                 <ChatBubble
                                     key={index}
-                                    variant={message.role == "user" ? "sent" : "received"}
+                                    variant={message.sender_id === parseInt(currentUser?.id!) ? "sent" : "received"}
                                 >
                                     <ChatBubbleAvatar
                                         src=""
-                                        fallback={message.role == "user" ? "👨🏽" : "🤖"}
+                                        fallback={message.sender_id === parseInt(currentUser?.id!) ? "👨🏽" : "👥"}
                                     />
                                     <ChatBubbleMessage>
                                         {message.content
@@ -152,11 +188,7 @@ export default function ChatMessage() {
 
                         {/* Chat Input */}
                         <div className="p-4 border-t dark:border-gray-700">
-                            <form
-                                ref={formRef}
-                                onSubmit={onSubmit}
-                                className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring dark:border-gray-700"
-                            >
+                            <div className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring dark:border-gray-700">
                                 <div className="flex">
                                     <ChatInput
                                         onKeyDown={onKeyDown}
@@ -165,7 +197,13 @@ export default function ChatMessage() {
                                         name="content"
                                     />
                                     <Button 
-                                        type="submit"
+                                        onClick={() => {
+                                            const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement;
+                                            if (textarea) {
+                                                const event = new KeyboardEvent('keydown', { key: 'Enter' });
+                                                textarea.dispatchEvent(event);
+                                            }
+                                        }}
                                         variant="ghost" 
                                         size="icon"
                                         className="mr-2"
@@ -185,7 +223,7 @@ export default function ChatMessage() {
                                         <span className="sr-only">Use Microphone</span>
                                     </Button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </>
                 ) : (
