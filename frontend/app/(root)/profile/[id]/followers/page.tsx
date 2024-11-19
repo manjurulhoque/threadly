@@ -1,4 +1,4 @@
-import UserFollowers from "@/components/users/UserFollowrs";
+import UserFollowers from "@/components/users/UserFollowers";
 
 export const metadata = {
     title: "Followers",
