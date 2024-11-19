@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MessageCircleMore } from "lucide-react";
+import { BellRing, MessageCircleMore } from "lucide-react";
 import { ModeToggle } from "@/components/shared/ModeToggle";
 import { useGetUnreadMessagesCountQuery } from "@/store/users/userApi";
 
@@ -35,6 +35,10 @@ function TopBar() {
                         {data?.unread_messages_count || null}
                         </span>
                     )}
+                </div>
+
+                <div className="relative cursor-pointer">
+                    <BellRing className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                 </div>
 
                 <ModeToggle/>
