@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import DynamicBaseQuery from "@/store/dynamic-base-query";
+import { User } from '@/types/user.type';
 
 type IsFollowingResponse = { data: boolean };
 
@@ -24,13 +25,25 @@ const followApi = createApi({
             query: (userId) => `users/${userId}/is-following`,
             providesTags: [ "Follow" ],
         }),
+        getUserFollowers: builder.query<{
+            users: User[];
+        }, number>({
+            query: (userId) => `users/${userId}/followers`,
+        }),
+        getUserFollowing: builder.query<{
+            users: User[];
+        }, number>({
+            query: (userId) => `users/${userId}/following`,
+        }),
     }),
 });
 
 export const {
     useFollowUserMutation,
     useUnfollowUserMutation,
-    useIsFollowingQuery
+    useIsFollowingQuery,
+    useGetUserFollowersQuery,
+    useGetUserFollowingQuery,
 } = followApi;
 
 export default followApi;

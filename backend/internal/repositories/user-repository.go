@@ -15,6 +15,8 @@ type UserRepository interface {
 	IsFollowing(followeeId, followerId uint) (bool, error)
 	GetThreadsForUser(userId uint) ([]models.Thread, error)
 	GetDB() *gorm.DB
+	GetUserFollowers(userId uint) ([]models.PublicUser, error)
+	GetUserFollowing(userId uint) ([]models.PublicUser, error)
 }
 
 type userRepository struct {
@@ -85,4 +87,16 @@ func (r *userRepository) GetThreadsForUser(userId uint) ([]models.Thread, error)
 	var threads []models.Thread
 	err := r.db.Where("user_id = ?", userId).Preload("User").Find(&threads).Error
 	return threads, err
+}
+
+func (r *userRepository) GetUserFollowers(userId uint) ([]models.PublicUser, error) {
+	var users []models.PublicUser
+	err := r.db.Raw(`SELECT * FROM users WHERE id IN (SELECT follower_id FROM follows WHERE followee_id = ?)`, userId).Scan(&users).Error
+	return users, err
+}
+
+func (r *userRepository) GetUserFollowing(userId uint) ([]models.PublicUser, error) {
+	var users []models.PublicUser
+	err := r.db.Raw(`SELECT * FROM users WHERE id IN (SELECT followee_id FROM follows WHERE follower_id = ?)`, userId).Scan(&users).Error
+	return users, err
 }

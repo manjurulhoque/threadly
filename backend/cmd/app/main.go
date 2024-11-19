@@ -101,6 +101,8 @@ func main() {
 		api.PUT("/users/update-profile", authMiddleware, userHandler.UpdateUserProfile)
 		api.GET("/similar-minds", authMiddleware, userHandler.GetSimilarMinds)
 		api.GET("/users/:id/total-threads", authMiddleware, threadHandler.TotalThreadsByUser)
+		api.GET("/users/:id/followers", authMiddleware, userHandler.GetUserFollowers)
+		api.GET("/users/:id/following", authMiddleware, userHandler.GetUserFollowing)
 
 		// Thread routes with auth
 		api.POST("/threads", authMiddleware, threadHandler.CreateThread)

@@ -241,3 +241,26 @@ func (h *UserHandler) GetUserSuggestions(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
+
+// GetUserFollowers Get User Followers
+func (h *UserHandler) GetUserFollowers(c *gin.Context) {
+	userId := c.Param("id")
+	users, err := h.userService.GetUserFollowers(utils.StringToUint(userId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+
+// GetUserFollowing Get User Following
+func (h *UserHandler) GetUserFollowing(c *gin.Context) {
+	userId := c.Param("id")
+	users, err := h.userService.GetUserFollowing(utils.StringToUint(userId))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+	
