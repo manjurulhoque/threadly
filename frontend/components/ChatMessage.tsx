@@ -8,23 +8,14 @@ import { Mic, Paperclip, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useWebSocket from "react-use-websocket";
-
-interface User {
-    id: number;
-    name: string;
-    avatar: string;
-}
-
-const users = [
-    { id: 1, name: "Alice", avatar: "/images/avatar1.png" },
-    { id: 2, name: "Bob", avatar: "/images/avatar2.png" },
-    { id: 3, name: "Charlie", avatar: "/images/avatar3.png" },
-];
+import { useGetChatUsersQuery } from "@/store/users/userApi";
+import { User } from "@/types/user.type";
 
 interface Message {
     role: 'user' | 'assistant';
     content: string;
 }
+
 
 export default function ChatMessage() {
     const [ activeUser, setActiveUser ] = useState<User | null>(null);
@@ -37,6 +28,8 @@ export default function ChatMessage() {
         shouldReconnect: (closeEvent) => true,
     });
     const [messages, setMessages] = useState<Message[]>([]);
+    const { data, isLoading: chatUsersLoading, error: chatUsersError } = useGetChatUsersQuery();
+    const users = data?.users ?? [];
 
     const messagesRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
@@ -80,23 +73,35 @@ export default function ChatMessage() {
             {/* Left Sidebar */}
             <div className="w-1/4 bg-background border-r p-4 shadow-lg dark:border-gray-700">
                 <h2 className="text-xl font-bold mb-4 text-foreground">Users</h2>
-                <ul className="space-y-4">
-                    {users.map((user) => (
-                        <li
-                            key={user.id}
-                            className={`flex items-center space-x-3 cursor-pointer p-2 rounded-md ${
-                                activeUser?.id === user.id ? "bg-muted" : "hover:bg-muted"
-                            }`}
-                            onClick={() => setActiveUser(user)}
-                        >
-                            <Avatar>
-                                <AvatarImage src={user.avatar} alt={user.name}/>
-                                <AvatarFallback>{user.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <span className={`font-medium text-foreground`}>{user.name}</span>
-                        </li>
-                    ))}
-                </ul>
+                {chatUsersLoading ? (
+                    <div className="flex items-center justify-center h-40">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                ) : chatUsersError ? (
+                    <div className="text-destructive text-center">Error loading users</div>
+                ) : users.length === 0 ? (
+                    <div className="text-muted-foreground text-center py-8">
+                        No users found. Check back later!
+                    </div>
+                ) : (
+                    <ul className="space-y-4">
+                        {users.map((user) => (
+                            <li
+                                key={user.id}
+                                className={`flex items-center space-x-3 cursor-pointer p-2 rounded-md ${
+                                    activeUser?.id === user.id ? "bg-muted" : "hover:bg-muted"
+                                }`}
+                                onClick={() => setActiveUser(user)}
+                            >
+                                <Avatar>
+                                    <AvatarImage src={user.image} alt={user.name}/>
+                                    <AvatarFallback>{user.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <span className={`font-medium text-foreground`}>{user.name}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
             {/* Chat Area */}
