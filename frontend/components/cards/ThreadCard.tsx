@@ -46,7 +46,7 @@ function ThreadCard({ thread }: Props) {
     };
 
     return (
-        <article className={`flex w-full flex-col rounded-xl bg-light-2 dark:bg-dark-2 p-7 shadow-md dark:shadow-none`}>
+        <article className={`flex w-full flex-col rounded-xl bg-light-2 dark:bg-dark-2 p-7 shadow-[0_0_10px_rgba(0,0,0,0.1)] dark:shadow-none`}>
             <div className='flex items-start justify-between'>
                 <div className='flex w-full flex-1 flex-row gap-4'>
                     <div className='flex flex-col items-center'>

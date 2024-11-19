@@ -6,14 +6,14 @@ export const likeApi = createApi({
     baseQuery: DynamicBaseQuery,
     tagTypes: [ 'Like' ],
     endpoints: (builder) => ({
-        likeThread: builder.mutation<void, void>({
+        likeThread: builder.mutation<void, number>({
             query: (threadId: number) => ({
                 url: `threads/${threadId}/like`,
                 method: 'POST',
             }),
             invalidatesTags: [ 'Like' ],
         }),
-        unlikeThread: builder.mutation<void, void>({
+        unlikeThread: builder.mutation<void, number>({
             query: (threadId: number) => ({
                 url: `threads/${threadId}/unlike`,
                 method: 'DELETE',

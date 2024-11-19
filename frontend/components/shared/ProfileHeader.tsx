@@ -5,10 +5,11 @@ import Image from "next/image";
 import { User } from "@/types/user.type";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { LoaderCircle, Trash, UserPlusIcon } from "lucide-react";
+import { LoaderCircle, MessageCircle, Trash, UserPlusIcon } from "lucide-react";
 import { useFollowUserMutation, useIsFollowingQuery, useUnfollowUserMutation } from "@/store/follow/followApi";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import ChatWindow from "./ChatWindow";
 
 interface Props {
     user: User;
@@ -22,6 +23,7 @@ function ProfileHeader({ user }: Props) {
     let { data: result, isLoading: isLoadingIsFollow, isSuccess } = useIsFollowingQuery(user.id);
     // State to track whether the user is followed
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     // Update `isFollowing` state when `result` changes
     useEffect(() => {
@@ -84,7 +86,7 @@ function ProfileHeader({ user }: Props) {
                 </div>
                 <div className='flex gap-3'>
                     {
-                        session?.user?.id === user.id ? (
+                        Number(session?.user?.id) === user.id ? (
                             <Link href='/profile/edit'>
                                 <div className='flex cursor-pointer gap-3 rounded-lg bg-dark-3 px-4 py-2'>
                                     <Image
@@ -97,37 +99,51 @@ function ProfileHeader({ user }: Props) {
                                     <p className='text-light-2 max-sm:hidden'>Edit</p>
                                 </div>
                             </Link>
-                        ) : null
-                    }
-                    {session?.user?.id !== user.id ? (
-                        isLoadingIsFollow ? (
-                            <LoaderCircle className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-300"/>
                         ) : (
-                            !isFollowing ? (
-                                <Button
+                            <>
+                                <Button 
                                     className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
-                                    onClick={onClickFollowUser}
+                                    onClick={() => setIsChatOpen(true)}
                                 >
-                                    <UserPlusIcon className="w-5 h-5"/>
-                                    Follow
+                                    <MessageCircle className="w-5 h-5"/>
+                                    <p className='max-sm:hidden'>Chat</p>
                                 </Button>
-                            ) : (
-                                <Button
-                                    className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
-                                    onClick={onClickUnfollowUser}
-                                >
-                                    <Trash className="w-5 h-5"/>
-                                    Unfollow
-                                </Button>
-                            )
+                                {isLoadingIsFollow ? (
+                                    <LoaderCircle className="w-6 h-6 animate-spin text-gray-500 dark:text-gray-300"/>
+                                ) : (
+                                    !isFollowing ? (
+                                        <Button
+                                            className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
+                                            onClick={onClickFollowUser}
+                                        >
+                                            <UserPlusIcon className="w-5 h-5"/>
+                                            Follow
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            className="flex cursor-pointer gap-3 rounded-lg dark:bg-dark-3 dark:hover:bg-dark-3 px-4 py-2 dark:text-light-2"
+                                            onClick={onClickUnfollowUser}
+                                        >
+                                            <Trash className="w-5 h-5"/>
+                                            Unfollow
+                                        </Button>
+                                    )
+                                )}
+                            </>
                         )
-                    ) : null}
+                    }
                 </div>
             </div>
 
             <p className='mt-6 max-w-lg text-base-regular dark:text-light-2'>{user.bio}</p>
 
             <div className='mt-12 h-0.5 w-full bg-dark-3'/>
+
+            <ChatWindow 
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                receiverUser={user}
+            />
         </div>
     );
 }

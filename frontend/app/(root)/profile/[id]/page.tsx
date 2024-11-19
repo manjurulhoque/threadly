@@ -40,7 +40,7 @@ async function Page({ params }: { params: { id: number } }) {
         const response = await fetchUser(params.id);
         if (!response || !response.data) {
             console.warn("User not found or incomplete data. Redirecting to onboarding.");
-            redirect('/onboarding');
+            permanentRedirect('/onboarding');
             return null;
         }
         userInfo = response.data;
@@ -60,6 +60,7 @@ async function Page({ params }: { params: { id: number } }) {
         totalThreads = await fetchTotalThreadsByUser(params.id);
     } catch (error: any) {
         console.error("Failed to fetch total threads by user:", error.message || error);
+        totalThreads = 0; // Set default value if fetch fails
     }
 
     return (
@@ -92,21 +93,18 @@ async function Page({ params }: { params: { id: number } }) {
                         value="threads"
                         className='w-full text-light-1'
                     >
-                        {/* @ts-ignore */}
                         <ThreadsTab userId={params.id} />
                     </TabsContent>
                     <TabsContent
                         value="replies"
                         className='w-full text-light-1'
                     >
-                        {/* @ts-ignore */}
                         <RepliedThreadsTab userId={params.id} />
                     </TabsContent>
                     <TabsContent
                         value="tagged"
                         className='w-full text-light-1'
                     >
-                        {/* @ts-ignore */}
                         <MentionedThreadsTab userId={params.id} />
                     </TabsContent>
                 </Tabs>
