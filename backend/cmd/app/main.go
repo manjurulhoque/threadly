@@ -92,6 +92,9 @@ func main() {
 		api.POST("/login", userHandler.Login)
 		api.POST("/token/refresh", userHandler.Refresh)
 
+		// Chat routes with auth
+		api.GET("/chat/users", authMiddleware, handlers.GetChatUsers)
+
 		// User routes with auth
 		api.GET("/users/:id", authMiddleware, userHandler.GetUserById)
 		api.PUT("/users/update-profile", authMiddleware, userHandler.UpdateUserProfile)

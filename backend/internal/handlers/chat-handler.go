@@ -29,6 +29,34 @@ type Message struct {
 	Content    string `json:"content"`
 }
 
+// GetChatUsers returns list of users the authenticated user has chatted with
+func GetChatUsers(c *gin.Context) {
+	userID := c.GetUint("userId")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var users []models.PublicUser
+	result := db.DB.Raw(`
+		SELECT DISTINCT u.* 
+		FROM users u
+		INNER JOIN messages m 
+		ON (m.sender_id = u.id OR m.receiver_id = u.id)
+		WHERE (m.sender_id = ? OR m.receiver_id = ?) 
+		AND u.id != ?`, 
+		userID, userID, userID).
+		Find(&users)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch chat users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}
+
+
 // HandleConnections WebSocket handler
 func HandleConnections(c *gin.Context) {
 	//upgrades the HTTP connection to a WebSocket connection
