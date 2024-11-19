@@ -16,7 +16,7 @@ function UserCard({ user }: Props) {
     const userImage = user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : "";
 
     return (
-        <article className='user-card'>
+        <article className='user-card border border-gray-200 dark:border-gray-700 shadow-md dark:shadow-gray-800 rounded-lg p-4'>
             <div className='user-card_avatar'>
                 <div className='relative h-12 w-12'>
                     {
