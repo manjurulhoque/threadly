@@ -94,6 +94,7 @@ func main() {
 
 		// Chat routes with auth
 		api.GET("/chat/users", authMiddleware, handlers.GetChatUsers)
+		api.GET("/chat/:receiverId/messages", authMiddleware, handlers.GetMessages)
 
 		// User routes with auth
 		api.GET("/users/:id", authMiddleware, userHandler.GetUserById)

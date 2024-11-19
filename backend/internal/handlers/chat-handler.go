@@ -56,6 +56,64 @@ func GetChatUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
+// GetMessages returns paginated messages between two users
+func GetMessages(c *gin.Context) {
+	// Get current user ID from context
+	userID := c.GetUint("userId")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Get receiver ID from URL param
+	receiverID, err := strconv.ParseUint(c.Param("receiverId"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid receiver ID"})
+		return
+	}
+
+	// Get pagination params from query
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
+	offset := (page - 1) * limit
+
+	var messages []models.Message
+	var total int64
+
+	// Get total count
+	result := db.DB.Model(&models.Message{}).
+		Where("(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)",
+			userID, receiverID, receiverID, userID).
+		Count(&total)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count messages"})
+		return
+	}
+
+	// Get paginated messages
+	result = db.DB.
+		Where("(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)",
+			userID, receiverID, receiverID, userID).
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&messages)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch messages"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"messages": messages,
+		"total":    total,
+		"page":     page,
+		"limit":    limit,
+	})
+}
+
+
 
 // HandleConnections WebSocket handler
 func HandleConnections(c *gin.Context) {
