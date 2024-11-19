@@ -14,6 +14,7 @@ type UserRepository interface {
 	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
 	IsFollowing(followeeId, followerId uint) (bool, error)
 	GetThreadsForUser(userId uint) ([]models.Thread, error)
+	GetDB() *gorm.DB
 }
 
 type userRepository struct {
@@ -22,6 +23,10 @@ type userRepository struct {
 
 func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db}
+}
+
+func (r *userRepository) GetDB() *gorm.DB {
+	return r.db
 }
 
 func (r *userRepository) CreateUser(user *models.User) error {

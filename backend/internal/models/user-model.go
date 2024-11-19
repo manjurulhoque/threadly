@@ -33,12 +33,14 @@ func (u *User) FollowingCount(db *gorm.DB) int64 {
 }
 
 type PublicUser struct {
-	Id        uint   `json:"id"`
-	Name      string `json:"name"`
-	Username  string `json:"username"`
-	Image     string `json:"image"`
-	Bio       string `json:"bio"`
-	Onboarded bool   `json:"onboarded"`
+	Id             uint   `json:"id"`
+	Name           string `json:"name"`
+	Username       string `json:"username"`
+	Image          string `json:"image"`
+	Bio            string `json:"bio"`
+	Onboarded      bool   `json:"onboarded"`
+	FollowersCount int64  `json:"followers_count,omitempty"`
+	FollowingCount int64  `json:"following_count,omitempty"`
 }
 
 func (u *PublicUser) TableName() string {

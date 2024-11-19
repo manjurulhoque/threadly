@@ -176,8 +176,10 @@ func (s *userService) GetUserById(userId uint) (*models.PublicUser, error) {
 		Name:      user.Name,
 		Username:  user.Username,
 		Image:     user.Image,
-		Bio:       user.Bio,
-		Onboarded: user.Onboarded,
+		Bio:            user.Bio,
+		Onboarded:      user.Onboarded,
+		FollowersCount: user.FollowersCount(s.userRepo.GetDB()),
+		FollowingCount: user.FollowingCount(s.userRepo.GetDB()),
 	}, nil
 }
 

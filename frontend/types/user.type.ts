@@ -5,4 +5,6 @@ export type User = {
     email: string;
     image: string;
     bio: string;
+    followers_count: number;
+    following_count: number;
 }
