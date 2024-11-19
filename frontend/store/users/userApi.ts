@@ -12,9 +12,12 @@ const userApi = createApi({
         getMessages: builder.query<{messages: Message[], total: number, page: number, limit: number}, {receiverId: number, page: number, limit: number}>({
             query: ({receiverId, page, limit}) => `chat/${receiverId}/messages?page=${page}&limit=${limit}`,
         }),
+        getUnreadMessagesCount: builder.query<{unread_messages_count: number}, void>({
+            query: () => "chat/unread-messages-count",
+        }),
     }),
 });
 
-export const { useGetChatUsersQuery, useGetMessagesQuery } = userApi;
+export const { useGetChatUsersQuery, useGetMessagesQuery, useGetUnreadMessagesCountQuery } = userApi;
 
 export default userApi;

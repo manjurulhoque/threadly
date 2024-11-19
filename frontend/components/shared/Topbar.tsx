@@ -1,8 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MessageCircleMore } from "lucide-react";
 import { ModeToggle } from "@/components/shared/ModeToggle";
+import { useGetUnreadMessagesCountQuery } from "@/store/users/userApi";
 
 function TopBar() {
+    const router = useRouter();
+    const { data } = useGetUnreadMessagesCountQuery();
+
     return (
         <nav className="topbar border-b border-gray-700">
             <Link href='/' className='flex items-center gap-4'>
@@ -19,7 +27,16 @@ function TopBar() {
                 />
             </div>
 
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-4'>
+                <div className="relative cursor-pointer" onClick={() => router.push('/chat')}>
+                    <MessageCircleMore className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                    {data?.unread_messages_count && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {data?.unread_messages_count || null}
+                        </span>
+                    )}
+                </div>
+
                 <ModeToggle/>
 
                 <div className='block md:hidden'>

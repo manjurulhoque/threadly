@@ -204,3 +204,23 @@ func GetChatHistory(c *gin.Context) {
 
 	c.JSON(http.StatusOK, messages)
 }
+
+func GetUnreadMessagesCount(c *gin.Context) {
+	userID := c.GetUint("userId")
+	if userID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var count int64
+	err := db.DB.Model(&models.Message{}).
+		Where("receiver_id = ? AND is_read = ?", userID, false).
+		Count(&count).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count unread messages"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"unread_messages_count": count})
+}
