@@ -45,7 +45,6 @@ export default function ChatMessage() {
     );
 
     const messagesRef = useRef<HTMLDivElement>(null);
-    const formRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
         if (messagesRef.current) {
@@ -100,6 +99,10 @@ export default function ChatMessage() {
         }
     };
 
+    const onChatUserClick = (user: User) => {
+        setActiveUser(user);
+    };
+
     const getUserImage = (user: User) => {
         return user.image ? `${process.env.BACKEND_BASE_URL}/${user.image}` : `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
     };
@@ -127,7 +130,7 @@ export default function ChatMessage() {
                                 className={`flex items-center space-x-3 cursor-pointer p-2 rounded-md ${
                                     activeUser?.id === user.id ? "bg-muted" : "hover:bg-muted"
                                 }`}
-                                onClick={() => setActiveUser(user)}
+                                onClick={() => onChatUserClick(user)}
                             >
                                 <Avatar>
                                     <AvatarImage src={getUserImage(user)} alt={user.name}/>
@@ -165,22 +168,8 @@ export default function ChatMessage() {
                                         src=""
                                         fallback={message.sender_id === parseInt(currentUser?.id!) ? "👨🏽" : "👥"}
                                     />
-                                    <ChatBubbleMessage>
-                                        {message.content
-                                            .split("```")
-                                            .map((part: string, index: number) => {
-                                                if (index % 2 === 0) {
-                                                    return (
-                                                        <>
-                                                            {part}
-                                                        </>
-                                                    );
-                                                } else {
-                                                    return (
-                                                        <pre className="whitespace-pre-wrap pt-2" key={index}></pre>
-                                                    );
-                                                }
-                                            })}
+                                    <ChatBubbleMessage key={index}>
+                                        {message.content}
                                     </ChatBubbleMessage>
                                 </ChatBubble>
                             ))}
