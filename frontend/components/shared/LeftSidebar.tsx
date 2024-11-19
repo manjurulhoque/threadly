@@ -23,12 +23,18 @@ const LeftSidebar = () => {
 
                     if (link.route === "/profile") link.route = `${link.route}/${userId}`;
 
+                    const finalRoute = link.route === "/profile" ? `/profile/${userId}` : link.route;
+
+                    const isActiveRoute =
+                        (pathname.includes(finalRoute) && finalRoute.length > 1) ||
+                        pathname === finalRoute;
+
                     return (
                         <Link
-                            href={link.route}
+                            href={finalRoute}
                             key={link.label}
                             className={`leftsidebar_link hover:bg-light-3 dark:hover:bg-dark-3 ${
-                                isActive ? "bg-primary-500" : ""
+                                isActiveRoute ? "bg-primary-500" : ""
                             }`}
                         >
                             <div className="invert-0 dark:invert brightness-0 dark:brightness-200">
@@ -52,7 +58,7 @@ const LeftSidebar = () => {
             <div className='mt-10 px-6'>
                 <div
                     className='flex cursor-pointer gap-4 p-4 hover:bg-light-3 dark:hover:bg-dark-3 rounded-lg'
-                    onClick={signOut}
+                    onClick={() => signOut()}
                 >
                     <div className="invert-0 dark:invert brightness-0 dark:brightness-200">
                         <Image

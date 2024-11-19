@@ -95,7 +95,7 @@ func GetMessages(c *gin.Context) {
 	result = db.DB.
 		Where("(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)",
 			userID, receiverID, receiverID, userID).
-		Order("created_at DESC").
+		Order("created_at ASC").
 		Offset(offset).
 		Limit(limit).
 		Find(&messages)
@@ -164,10 +164,10 @@ func HandleMessages(db *gorm.DB, wg *sync.WaitGroup) {
 		msg := <-broadcast
 
 		// Save message to the database
-		// err := SaveMessageToDB(db, msg)
-		// if err != nil {
-		// 	fmt.Println("Failed to save message:", err)
-		// }
+		err := SaveMessageToDB(db, msg)
+		if err != nil {
+			slog.Error("Failed to save message", "error", err.Error())
+		}
 
 		// Send message to all clients
 		for client := range clients {

@@ -3,12 +3,12 @@ package models
 import "time"
 
 type Message struct {
-	ID         uint      `gorm:"primaryKey"`
-	SenderId   uint      `gorm:"not null"` // User who sent the message
-	ReceiverId uint      `gorm:"not null"` // User or Group receiving the message
-	Content    string    `gorm:"not null"` // Message content
-	CreatedAt  time.Time `gorm:"autoCreateTime"`
-	IsRead     bool      `gorm:"default:false"` // Read status
+	Id         uint      `json:"id" gorm:"primaryKey"`
+	SenderId   uint      `json:"sender_id" gorm:"not null"` // User who sent the message
+	ReceiverId uint      `json:"receiver_id" gorm:"not null"` // User or Group receiving the message
+	Content    string    `json:"content" gorm:"not null"` // Message content
+	CreatedAt  time.Time `json:"created_at" gorm:"autoCreateTime"`
+	IsRead     bool      `json:"is_read" gorm:"default:false"` // Read status
 }
 
 func (m *Message) TableName() string {

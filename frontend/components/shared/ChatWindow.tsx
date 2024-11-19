@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useGetChatUsersQuery } from "@/store/users/userApi";
+import { useGetChatUsersQuery, useGetMessagesQuery } from "@/store/users/userApi";
 import { User } from "@/types/user.type";
 import useWebSocket from "react-use-websocket";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,7 @@ import { Message } from "@/types/message.type";
 interface ChatWindowProps {
     isOpen: boolean;
     onClose: () => void;
-    receiverUser?: User;
+    receiverUser: User;
 }
 
 
@@ -24,11 +24,20 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
     const [messages, setMessages] = useState<Message[]>([]);
     const messagesRef = useRef<HTMLDivElement>(null);
     const { data: session } = useSession(); // Get current logged in user
+    const { data, isLoading: messagesLoading } = useGetMessagesQuery({receiverId: receiverUser?.id, page: 1, limit: 20});
+    const previousMessages = data?.messages ?? [];
     
     const socketUrl = "ws://localhost:8080/ws";
     const { sendJsonMessage } = useWebSocket(socketUrl, {
         onMessage: (event) => {
-            console.log(event.data);
+            const message = JSON.parse(event.data);
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                content: message.content,
+                created_at: new Date().toISOString(),
+                sender_id: message.sender_id,
+                receiver_id: message.receiver_id
+            }]);
         },
         shouldReconnect: (closeEvent) => true,
     });
@@ -37,7 +46,10 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
         if (messagesRef.current) {
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
         }
-    }, [messages]);
+        if (previousMessages.length > 0) {
+            setMessages(previousMessages);
+        }
+    }, [previousMessages]);
 
     if (!isOpen || !receiverUser) return null;
 
@@ -57,13 +69,13 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
 
         sendJsonMessage(message);
         
-        setMessages(prev => [...prev, {
-            id: Date.now(),
-            content,
-            created_at: new Date().toISOString(),
-            sender_id: parseInt(session.user.id!),
-            receiver_id: receiverUser.id
-        }]);
+        // setMessages(prev => [...prev, {
+        //     id: Date.now(),
+        //     content,
+        //     created_at: new Date().toISOString(),
+        //     sender_id: parseInt(session.user.id!),
+        //     receiver_id: receiverUser.id
+        // }]);
 
         // Clear the input
         event.currentTarget.value = '';
