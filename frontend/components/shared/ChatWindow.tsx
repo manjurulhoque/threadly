@@ -51,6 +51,13 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
         }
     }, [previousMessages]);
 
+    // Add effect to scroll to bottom when window opens
+    useEffect(() => {
+        if (isOpen && messagesRef.current) {
+            messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+        }
+    }, [isOpen]);
+
     if (!isOpen || !receiverUser) return null;
 
     const onSubmit = async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -79,6 +86,11 @@ export default function ChatWindow({ isOpen, onClose, receiverUser }: ChatWindow
 
         // Clear the input
         event.currentTarget.value = '';
+
+        // Scroll to bottom after sending message
+        if (messagesRef.current) {
+            messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+        }
     };
 
     return (
