@@ -134,6 +134,7 @@ func main() {
 
 		// Notification routes with auth
 		api.GET("/notifications", authMiddleware, notificationHandler.GetNotifications)
+		api.POST("/notifications/mark-all-as-read", authMiddleware, notificationHandler.MarkAllNotificationsAsRead)
 	}
 
 	// run the server

@@ -10,6 +10,7 @@ type NotificationRepository interface {
 	GetNotificationsByUserId(userId uint) ([]models.Notification, error)
 	MarkAsRead(notificationId uint) error
 	MarkAllAsRead(userId uint) error
+	MarkAllNotificationsAsRead(userId uint) error
 }
 
 type notificationRepository struct {
@@ -35,5 +36,9 @@ func (r *notificationRepository) MarkAsRead(notificationId uint) error {
 }
 
 func (r *notificationRepository) MarkAllAsRead(userId uint) error {
+	return r.db.Model(&models.Notification{}).Where("user_id = ?", userId).Update("is_read", true).Error
+}
+
+func (r *notificationRepository) MarkAllNotificationsAsRead(userId uint) error {
 	return r.db.Model(&models.Notification{}).Where("user_id = ?", userId).Update("is_read", true).Error
 }

@@ -25,3 +25,14 @@ func (h *NotificationHandler) GetNotifications(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"notifications": notifications})
 }
+
+func (h *NotificationHandler) MarkAllNotificationsAsRead(c *gin.Context) {
+	userId := c.GetUint("userId")
+	err := h.notificationService.MarkAllNotificationsAsRead(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}

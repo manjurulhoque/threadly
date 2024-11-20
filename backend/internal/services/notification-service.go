@@ -10,6 +10,7 @@ type NotificationService interface {
 	GetNotificationsByUserId(userId uint) ([]models.Notification, error)
 	MarkAsRead(notificationId uint) error
 	MarkAllAsRead(userId uint) error
+	MarkAllNotificationsAsRead(userId uint) error
 }
 
 type notificationService struct {
@@ -34,4 +35,8 @@ func (s *notificationService) MarkAsRead(notificationId uint) error {
 
 func (s *notificationService) MarkAllAsRead(userId uint) error {
 	return s.notificationRepository.MarkAllAsRead(userId)
+}
+
+func (s *notificationService) MarkAllNotificationsAsRead(userId uint) error {
+	return s.notificationRepository.MarkAllNotificationsAsRead(userId)
 }

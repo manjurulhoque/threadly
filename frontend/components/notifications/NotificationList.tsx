@@ -1,11 +1,12 @@
 "use client";
 
-import { useGetNotificationsQuery } from "@/store/notifications/notificationApi";
+import { useGetNotificationsQuery, useMarkAllNotificationsAsReadMutation } from "@/store/notifications/notificationApi";
 import { Bell, UserCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 const NotificationList = () => {
     const { data, isLoading, isError } = useGetNotificationsQuery();
+    const [markAllNotificationsAsRead, { isLoading: isMarkingAllNotificationsAsRead }] = useMarkAllNotificationsAsReadMutation();
 
     if (isLoading) {
         return (
@@ -39,10 +40,7 @@ const NotificationList = () => {
             <div className="flex justify-end mb-4">
                 <button 
                     className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                    onClick={() => {
-                        // TODO: Implement mark all as read functionality
-                        console.log("Mark all as read clicked");
-                    }}
+                    onClick={() => markAllNotificationsAsRead().unwrap()}
                 >
                     Mark all as read
                 </button>
