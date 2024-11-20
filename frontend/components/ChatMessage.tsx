@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Mic, Paperclip, Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import useWebSocket from "react-use-websocket";
+import { useWebSocketContext } from '@/contexts/WebSocketContext';
 import { useGetChatUsersQuery, useGetMessagesQuery } from "@/store/users/userApi";
 import { User } from "@/types/user.type";
 import { Message } from "@/types/message.type";
@@ -18,23 +18,10 @@ export default function ChatMessage() {
     const { data: session } = useSession();
     const currentUser = session?.user;
     const [ activeUser, setActiveUser ] = useState<User | null>(null);
-    const socketUrl = `ws://localhost:8080/ws?token=${session?.access}`;
-    const { sendMessage, sendJsonMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-        onMessage: (event) => {
-            const message = JSON.parse(event.data);
-            setMessages(prev => [...prev, {
-                id: Date.now(),
-                content: message.content,
-                created_at: new Date().toISOString(),
-                sender_id: message.sender_id,
-                receiver_id: message.receiver_id
-            }]);
-        },
-        shouldReconnect: (closeEvent) => true,
-    });
-    const [messages, setMessages] = useState<Message[]>([]);
+    const { sendMessage, lastMessage } = useWebSocketContext();
     const { data: chatUsersData, isLoading: chatUsersLoading, error: chatUsersError } = useGetChatUsersQuery();
     const users = chatUsersData?.users ?? [];
+    const [messages, setMessages] = useState<Message[]>([]);
 
     const { 
         data: messagesData, 
@@ -58,6 +45,21 @@ export default function ChatMessage() {
         }
     }, [activeUser, messagesData]);
 
+    useEffect(() => {
+        if (lastMessage) {
+            const message = JSON.parse(lastMessage.data);
+            if (message.type === "message") {   
+                setMessages(prev => [...prev, {
+                    id: Date.now(),
+                    content: message.content,
+                    created_at: new Date().toISOString(),
+                    sender_id: message.sender_id,
+                    receiver_id: message.receiver_id
+                }]);
+            }
+        }
+    }, [lastMessage]);
+
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -71,10 +73,7 @@ export default function ChatMessage() {
             content: content.trim(),
         };
 
-        // Send JSON message
-        sendJsonMessage(message);
-
-        // Clear the form input
+        sendMessage(JSON.stringify(message));
         e.currentTarget.reset();
     };
 
@@ -91,10 +90,7 @@ export default function ChatMessage() {
                 content: content.trim(),
             };
 
-            // Send JSON message
-            sendJsonMessage(message);
-
-            // Clear the input
+            sendMessage(JSON.stringify(message));
             e.currentTarget.value = '';
         }
     };

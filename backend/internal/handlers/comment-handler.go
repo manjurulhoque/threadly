@@ -87,6 +87,14 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		if err := h.notificationService.CreateNotification(notification); err != nil {
 			slog.Error("Failed to create notification for comment creation", "error", err.Error())
 		}
+
+		// Broadcast the comment to the thread's users
+		broadcast <- Message{
+			SenderId:   userId.(uint),
+			ReceiverId: thread.UserID,
+			Content:    comment.Content,
+			Type:       "comment",
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"comment": comment})

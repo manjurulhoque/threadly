@@ -20,13 +20,14 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var broadcast = make(chan Message) // Channel to broadcast messages
-
 type Message struct {
+	Type       string `json:"type"`
 	SenderId   uint   `json:"sender_id"`
 	ReceiverId uint   `json:"receiver_id"`
 	Content    string `json:"content"`
 }
+
+var broadcast = make(chan Message) // Channel to broadcast messages to all connected clients
 
 type ConnectionManager struct {
 	userConnections map[uint][]*websocket.Conn // Map user ID to their connections (allowing multiple devices)
@@ -158,6 +159,7 @@ func HandleConnections(c *gin.Context) {
 			slog.Error("Error reading message", "error", err.Error())
 			break
 		}
+		msg.Type = "message" // Set default type as message
 		slog.Info("Received message from WebSocket", "message", msg)
 		broadcast <- msg
 	}
@@ -181,36 +183,49 @@ func HandleMessages(db *gorm.DB, wg *sync.WaitGroup) {
 		msg := <-broadcast
 		slog.Info("Received message from broadcast channel", "message", msg)
 
-		// Save message to the database
-		err := SaveMessageToDB(db, msg)
-		if err != nil {
-			slog.Error("Failed to save message", "error", err.Error())
-			continue
-		}
+		switch msg.Type {
+		case "comment":
+			manager.mu.RLock()
+			// Send notification to the receiver
+			for _, conn := range manager.userConnections[msg.ReceiverId] {
+				if err := conn.WriteJSON(msg); err != nil {
+					slog.Error("Failed to send notification", "error", err.Error())
+					conn.Close()
+				}
+			}
+			manager.mu.RUnlock()
+		case "message":
+			// Save message to the database
+			err := SaveMessageToDB(db, msg)
+			if err != nil {
+				slog.Error("Failed to save message", "error", err.Error())
+				continue
+			}
 
-		// Direct access to relevant connections
-		manager.mu.RLock()
-		// Send to sender's connections
-		if senderConn, ok := manager.userConnections[msg.SenderId]; ok {
-			slog.Info("Sending message to sender", "sender_id", msg.SenderId)
-			for _, conn := range senderConn {
-				if err := conn.WriteJSON(msg); err != nil {
-					slog.Error("Failed to send to sender", "error", err.Error())
-					conn.Close()
+			// Direct access to relevant connections
+			manager.mu.RLock()
+			// Send to sender's connections
+			if senderConn, ok := manager.userConnections[msg.SenderId]; ok {
+				slog.Info("Sending message to sender", "sender_id", msg.SenderId)
+				for _, conn := range senderConn {
+					if err := conn.WriteJSON(msg); err != nil {
+						slog.Error("Failed to send to sender", "error", err.Error())
+						conn.Close()
+					}
 				}
 			}
-		}
-		// Send to receiver's connections
-		if receiverConn, ok := manager.userConnections[msg.ReceiverId]; ok {
-			slog.Info("Sending message to receiver", "receiver_id", msg.ReceiverId)
-			for _, conn := range receiverConn {
-				if err := conn.WriteJSON(msg); err != nil {
-					slog.Error("Failed to send to receiver", "error", err.Error())
-					conn.Close()
+			// Send to receiver's connections
+			if receiverConn, ok := manager.userConnections[msg.ReceiverId]; ok {
+				slog.Info("Sending message to receiver", "receiver_id", msg.ReceiverId)
+				for _, conn := range receiverConn {
+					if err := conn.WriteJSON(msg); err != nil {
+						slog.Error("Failed to send to receiver", "error", err.Error())
+						conn.Close()
+					}
 				}
 			}
+			manager.mu.RUnlock()
 		}
-		manager.mu.RUnlock()
 	}
 }
 
