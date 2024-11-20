@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, } from "@/components
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { addCommentToThread } from "@/lib/actions/thread.actions";
+import { useComments } from "@/context/CommentsContext";
 
 interface Props {
     threadId: number;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const CommentForm = ({threadId, currentUserImg}: Props) => {
+    const { refreshComments } = useComments();
     const form = useForm<z.infer<any>>({
         // resolver: zodResolver(CommentValidation),
         defaultValues: {
@@ -26,6 +28,7 @@ const CommentForm = ({threadId, currentUserImg}: Props) => {
         await addCommentToThread(threadId, values.content);
 
         form.reset();
+        refreshComments();
     };
 
     const userImage = currentUserImg ? `${process.env.BACKEND_BASE_URL}/${currentUserImg}` : "";

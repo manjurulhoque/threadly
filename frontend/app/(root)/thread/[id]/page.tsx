@@ -8,6 +8,7 @@ import ThreadCard from "@/components/cards/ThreadCard";
 import { fetchThread } from "@/lib/actions/thread.actions";
 import CommentForm from "@/components/forms/CommentForm";
 import CommentList from "@/components/comments/CommentList";
+import { CommentsProvider } from "@/context/CommentsContext";
 
 export const metadata = {
     title: "Single Thread",
@@ -80,22 +81,24 @@ const Page: React.FC<Props> = async ({ params: { id } }) => {
     }
 
     return (
-        <section className='relative'>
-            <div>
-                <ThreadCard thread={thread} />
-            </div>
+        <CommentsProvider>
+            <section className='relative'>
+                <div>
+                    <ThreadCard thread={thread} />
+                </div>
 
-            <div className='mt-7'>
-                <CommentForm
-                    threadId={Number(id)}
-                    currentUserImg={userInfo.image}
-                />
-            </div>
+                <div className='mt-7'>
+                    <CommentForm
+                        threadId={Number(id)}
+                        currentUserImg={userInfo.image}
+                    />
+                </div>
 
-            <div className='mt-10'>
-                <CommentList threadId={id} />
-            </div>
-        </section>
+                <div className='mt-10'>
+                    <CommentList threadId={id} />
+                </div>
+            </section>
+        </CommentsProvider>
     );
 };
 
