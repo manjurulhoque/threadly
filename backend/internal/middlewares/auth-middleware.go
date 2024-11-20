@@ -15,6 +15,7 @@ const (
 	userIdKey              = "userId"
 	emailKey               = "email"
 	isAdminKey             = "isAdmin"
+	tokenKey               = "token"
 )
 
 func AuthMiddleware(userRepo repositories.UserRepository, userService services.UserService) gin.HandlerFunc {
@@ -48,6 +49,33 @@ func AuthMiddleware(userRepo repositories.UserRepository, userService services.U
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "Unauthorized",
 			})
+			c.Abort()
+			return
+		}
+
+		c.Set(claimsKey, claims)
+		c.Set(userIdKey, user.ID)
+		c.Set(emailKey, user.Email)
+		c.Set(isAdminKey, user.IsAdmin)
+		c.Next()
+	}
+}
+
+// WebSocketAuthMiddleware is a middleware to authenticate WebSocket connections
+func WebSocketAuthMiddleware(userRepo repositories.UserRepository, userService services.UserService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// get token from query params
+		bearerToken := c.Query(tokenKey)
+		claims, err := userService.VerifyToken(bearerToken)
+		if err != nil {
+			slog.Error("Error verifying token", "error", err.Error())
+			c.Abort()
+			return
+		}
+
+		user, err := userRepo.GetUserByEmail(claims.Email)
+		if err != nil || user.Email != claims.Email {
+			slog.Error("Unauthorized access attempt", "error", "User does not match token claims")
 			c.Abort()
 			return
 		}

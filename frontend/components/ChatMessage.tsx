@@ -18,7 +18,7 @@ export default function ChatMessage() {
     const { data: session } = useSession();
     const currentUser = session?.user;
     const [ activeUser, setActiveUser ] = useState<User | null>(null);
-    const socketUrl = "ws://localhost:8080/ws";
+    const socketUrl = `ws://localhost:8080/ws?token=${session?.access}`;
     const { sendMessage, sendJsonMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
         onMessage: (event) => {
             const message = JSON.parse(event.data);

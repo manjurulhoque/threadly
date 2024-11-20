@@ -20,13 +20,21 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var clients = make(map[*websocket.Conn]bool) // Connected clients
-var broadcast = make(chan Message)           // Channel to broadcast messages
+var broadcast = make(chan Message) // Channel to broadcast messages
 
 type Message struct {
 	SenderId   uint   `json:"sender_id"`
 	ReceiverId uint   `json:"receiver_id"`
 	Content    string `json:"content"`
+}
+
+type ConnectionManager struct {
+	userConnections map[uint][]*websocket.Conn // Map user ID to their connections (allowing multiple devices)
+	mu              sync.RWMutex               // Mutex for thread-safe operations
+}
+
+var manager = ConnectionManager{
+	userConnections: make(map[uint][]*websocket.Conn),
 }
 
 // GetChatUsers returns list of users the authenticated user has chatted with
@@ -44,7 +52,7 @@ func GetChatUsers(c *gin.Context) {
 		INNER JOIN messages m 
 		ON (m.sender_id = u.id OR m.receiver_id = u.id)
 		WHERE (m.sender_id = ? OR m.receiver_id = ?) 
-		AND u.id != ?`, 
+		AND u.id != ?`,
 		userID, userID, userID).
 		Find(&users)
 
@@ -113,37 +121,44 @@ func GetMessages(c *gin.Context) {
 	})
 }
 
-
-
-// HandleConnections WebSocket handler
+// HandleConnections updated to use the new structure
 func HandleConnections(c *gin.Context) {
-	//upgrades the HTTP connection to a WebSocket connection
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		slog.Error("WebSocket Upgrade Error", "error", err.Error())
 		return
 	}
-	defer func(ws *websocket.Conn) {
-		err := ws.Close()
-		if err != nil {
-			slog.Error("WebSocket Close Error", "error", err.Error())
+
+	userID := c.GetUint("userId")
+	slog.Info("New WebSocket connection", "user_id", userID)
+
+	// Close existing connection if any
+	manager.mu.Lock()
+	if existingConn, exists := manager.userConnections[userID]; exists {
+		for _, conn := range existingConn {
+			conn.Close()
 		}
-	}(ws)
+	}
+	manager.userConnections[userID] = []*websocket.Conn{ws}
+	manager.mu.Unlock()
 
-	clients[ws] = true
+	defer func() {
+		slog.Info("WebSocket connection closing", "user_id", userID)
+		manager.mu.Lock()
+		delete(manager.userConnections, userID)
+		manager.mu.Unlock()
+		ws.Close()
+	}()
 
+	// Handle incoming messages
 	for {
 		var msg Message
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-			// If an error occurs, remove the client and break the loop
-			slog.Error("WebSocket Read Error", "error", err.Error())
-			delete(clients, ws)
+			slog.Error("Error reading message", "error", err.Error())
 			break
 		}
-
-		// Process and broadcast the message
-		slog.Info("Received message", "message", msg)
+		slog.Info("Received message from WebSocket", "message", msg)
 		broadcast <- msg
 	}
 }
@@ -157,26 +172,45 @@ func SaveMessageToDB(db *gorm.DB, msg Message) error {
 	return db.Create(&message).Error
 }
 
-// HandleMessages Broadcast messages to all connected clients
+// HandleMessages updated for efficient message delivery
 func HandleMessages(db *gorm.DB, wg *sync.WaitGroup) {
+	slog.Info("Starting HandleMessages") // Add logging
 	defer wg.Done()
 	for {
+		slog.Info("Waiting for message from broadcast channel")
 		msg := <-broadcast
+		slog.Info("Received message from broadcast channel", "message", msg)
 
 		// Save message to the database
 		err := SaveMessageToDB(db, msg)
 		if err != nil {
 			slog.Error("Failed to save message", "error", err.Error())
+			continue
 		}
 
-		// Send message to all clients
-		for client := range clients {
-			err := client.WriteJSON(msg)
-			if err != nil {
-				client.Close()
-				delete(clients, client)
+		// Direct access to relevant connections
+		manager.mu.RLock()
+		// Send to sender's connections
+		if senderConn, ok := manager.userConnections[msg.SenderId]; ok {
+			slog.Info("Sending message to sender", "sender_id", msg.SenderId)
+			for _, conn := range senderConn {
+				if err := conn.WriteJSON(msg); err != nil {
+					slog.Error("Failed to send to sender", "error", err.Error())
+					conn.Close()
+				}
 			}
 		}
+		// Send to receiver's connections
+		if receiverConn, ok := manager.userConnections[msg.ReceiverId]; ok {
+			slog.Info("Sending message to receiver", "receiver_id", msg.ReceiverId)
+			for _, conn := range receiverConn {
+				if err := conn.WriteJSON(msg); err != nil {
+					slog.Error("Failed to send to receiver", "error", err.Error())
+					conn.Close()
+				}
+			}
+		}
+		manager.mu.RUnlock()
 	}
 }
 

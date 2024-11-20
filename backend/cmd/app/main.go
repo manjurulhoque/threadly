@@ -83,7 +83,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}
 	router.Use(cors.New(corsConfig))
-	router.GET("/ws", handlers.HandleConnections)
+	router.GET("/ws", middlewares.WebSocketAuthMiddleware(userRepo, userService), handlers.HandleConnections)
 
 	// Group API routes for better organization and middleware reuse
 	api := router.Group("/api")
