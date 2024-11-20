@@ -53,7 +53,7 @@ function TopBar() {
                     )}
                 </div>
 
-                <div className="relative cursor-pointer">
+                <div className="relative cursor-pointer" onClick={() => router.push('/notifications')}>
                     <BellRing className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                 </div>
 

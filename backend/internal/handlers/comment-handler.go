@@ -75,6 +75,12 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 		slog.Error("Failed to get thread by id for notification creation in comment handler", "error", err.Error())
 	}
 
+	currentUser, exists := c.Get("user")
+	if !exists {
+		slog.Error("Current user not found in comment handler")
+	}
+	user := currentUser.(*models.User)
+
 	if thread != nil {
 		// Create notification for the thread owner
 		notification := &models.Notification{
@@ -84,6 +90,8 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 			ThreadId:  &comment.ThreadId,
 			CommentId: &comment.ID,
 			Url:       fmt.Sprintf("/threads/%s", threadId),
+			Title:     fmt.Sprintf("%s commented on your thread", user.Name),
+			Content:   comment.Content,
 		}
 
 		if err := h.notificationService.CreateNotification(notification); err != nil {
@@ -96,6 +104,7 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 			ReceiverId: thread.UserID,
 			Content:    comment.Content,
 			Type:       "comment",
+			Title:      fmt.Sprintf("%s commented on your thread", user.Name),
 		}
 	}
 

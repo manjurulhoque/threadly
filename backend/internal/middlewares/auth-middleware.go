@@ -16,6 +16,7 @@ const (
 	emailKey               = "email"
 	isAdminKey             = "isAdmin"
 	tokenKey               = "token"
+	userKey                = "user"
 )
 
 func AuthMiddleware(userRepo repositories.UserRepository, userService services.UserService) gin.HandlerFunc {
@@ -57,6 +58,7 @@ func AuthMiddleware(userRepo repositories.UserRepository, userService services.U
 		c.Set(userIdKey, user.ID)
 		c.Set(emailKey, user.Email)
 		c.Set(isAdminKey, user.IsAdmin)
+		c.Set(userKey, user)
 		c.Next()
 	}
 }
@@ -84,6 +86,7 @@ func WebSocketAuthMiddleware(userRepo repositories.UserRepository, userService s
 		c.Set(userIdKey, user.ID)
 		c.Set(emailKey, user.Email)
 		c.Set(isAdminKey, user.IsAdmin)
+		c.Set(userKey, user)
 		c.Next()
 	}
 }

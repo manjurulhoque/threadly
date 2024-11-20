@@ -62,6 +62,7 @@ func main() {
 	threadHandler := handlers.NewThreadHandler(threadService)
 	commentHandler := handlers.NewCommentHandler(commentService, notificationService, threadService)
 	likeHandler := handlers.NewLikeHandler(likeService)
+	notificationHandler := handlers.NewNotificationHandler(notificationService)
 
 	// Set up WebSocket message handler
 	var wg sync.WaitGroup
@@ -130,6 +131,9 @@ func main() {
 		api.GET("/users/:id/replied-threads", authMiddleware, threadHandler.GetThreadsUserReplied)
 		api.GET("/users/:id/mentioned-threads", authMiddleware, threadHandler.GetThreadsWhereUserWasMentioned)
 		api.GET("/user-suggestions", authMiddleware, userHandler.GetUserSuggestions)
+
+		// Notification routes with auth
+		api.GET("/notifications", authMiddleware, notificationHandler.GetNotifications)
 	}
 
 	// run the server

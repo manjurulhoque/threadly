@@ -24,6 +24,7 @@ type Message struct {
 	Type       string `json:"type"`
 	SenderId   uint   `json:"sender_id"`
 	ReceiverId uint   `json:"receiver_id"`
+	Title      string `json:"title"`
 	Content    string `json:"content"`
 }
 

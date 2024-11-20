@@ -17,6 +17,8 @@ type Notification struct {
 	CommentId *uint            `json:"comment_id"`               // ID of the comment if the notification is related to a comment
 	IsRead    bool             `json:"is_read" gorm:"default:false"`
 	Url       string           `json:"url"`
+	Title     string           `json:"title"`
+	Content   string           `json:"content"`
 
 	// Relationships
 	User  User `json:"-" gorm:"foreignKey:UserId"` // User who received the notification
