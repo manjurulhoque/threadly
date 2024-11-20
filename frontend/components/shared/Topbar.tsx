@@ -6,10 +6,26 @@ import { useRouter } from "next/navigation";
 import { BellRing, MessageCircleMore } from "lucide-react";
 import { ModeToggle } from "@/components/shared/ModeToggle";
 import { useGetUnreadMessagesCountQuery } from "@/store/users/userApi";
+import { useEffect } from "react";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
+import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 function TopBar() {
+    const {data: session} = useSession();
+    const currentUser = session?.user;
     const router = useRouter();
     const { data } = useGetUnreadMessagesCountQuery();
+    const { sendMessage, lastMessage } = useWebSocketContext();
+
+    useEffect(() => {
+        if (lastMessage) {
+            const newMessage = JSON.parse(lastMessage.data);
+            if (newMessage.type === "comment" && newMessage.receiver_id === currentUser?.id && newMessage.sender_id !== currentUser?.id) {
+                toast.info("You have a new comment on your thread!");
+            }
+        }
+    }, [lastMessage]);
 
     return (
         <nav className="topbar border-b border-gray-700">
