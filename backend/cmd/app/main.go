@@ -48,17 +48,19 @@ func main() {
 	threadRepo := repositories.NewThreadRepository(db.DB)
 	commentRepo := repositories.NewCommentRepository(db.DB)
 	likeRepo := repositories.NewLikeRepository(db.DB)
+	notificationRepo := repositories.NewNotificationRepository(db.DB)
 
 	// Initialize services with pointer receivers
 	userService := services.NewUserService(userRepo)
 	threadService := services.NewThreadService(threadRepo)
 	commentService := services.NewCommentService(commentRepo)
 	likeService := services.NewLikeService(likeRepo)
+	notificationService := services.NewNotificationService(notificationRepo)
 
 	// Initialize handlers with pointer receivers
 	userHandler := handlers.NewUserHandler(userService)
 	threadHandler := handlers.NewThreadHandler(threadService)
-	commentHandler := handlers.NewCommentHandler(commentService)
+	commentHandler := handlers.NewCommentHandler(commentService, notificationService, threadService)
 	likeHandler := handlers.NewLikeHandler(likeService)
 
 	// Set up WebSocket message handler

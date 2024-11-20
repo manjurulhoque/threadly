@@ -1,19 +1,27 @@
 package handlers
 
 import (
+	"log/slog"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
 	"github.com/manjurulhoque/threadly/backend/pkg/utils"
-	"net/http"
 )
 
 type CommentHandler struct {
-	commentService services.CommentService
+	commentService      services.CommentService
+	notificationService services.NotificationService
+	threadService       services.ThreadService
 }
 
-func NewCommentHandler(commentService services.CommentService) *CommentHandler {
-	return &CommentHandler{commentService: commentService}
+func NewCommentHandler(commentService services.CommentService, notificationService services.NotificationService, threadService services.ThreadService) *CommentHandler {
+	return &CommentHandler{
+		commentService:      commentService,
+		notificationService: notificationService,
+		threadService:       threadService,
+	}
 }
 
 func (h *CommentHandler) CommentsByThreadId(c *gin.Context) {
@@ -59,6 +67,26 @@ func (h *CommentHandler) CreateComment(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	thread, err := h.threadService.GetThreadById(comment.ThreadId)
+	if err != nil {
+		slog.Error("Failed to get thread by id for notification creation in comment handler", "error", err.Error())
+	}
+
+	if thread != nil {
+		// Create notification for the thread owner
+		notification := &models.Notification{
+			UserId:    thread.UserID, // Thread owner will receive the notification
+			ActorId:   userId.(uint), // current user is the actor
+			Type:      models.NotificationTypeComment,
+			ThreadId:  &comment.ThreadId,
+			CommentId: &comment.ID,
+		}
+
+		if err := h.notificationService.CreateNotification(notification); err != nil {
+			slog.Error("Failed to create notification for comment creation", "error", err.Error())
+		}
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"comment": comment})
