@@ -3,23 +3,36 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAddThreadMutation } from "@/store/threads/threadApi";
 import { toast } from "react-toastify";
 import { Loader } from "lucide-react";
-import { Mention, MentionsInput } from "react-mentions"; // React-Mentions library
+import { Mention, MentionsInput } from "react-mentions";
 import { useSession } from "next-auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// Define types for mentions
+interface Mention {
+    id: string | number;
+    display: string;
+}
+
+// Define form schema
+const threadSchema = z.object({
+    content: z.string().min(1, "Thread content is required"),
+});
+
+type ThreadFormValues = z.infer<typeof threadSchema>;
 
 // Styles for MentionsInput
 const mentionStyle = {
     control: {
         fontSize: 16,
         fontWeight: "normal",
-        minHeight: 150, // Adjust height for more rows
-        overflow: "auto", // Enable scrolling for large content
+        minHeight: 150,
+        overflow: "auto",
     },
     highlighter: {
         overflow: "hidden",
@@ -29,7 +42,7 @@ const mentionStyle = {
     },
     "&multiLine": {
         control: {
-            minHeight: 150, // Adjust height here
+            minHeight: 150,
         },
         highlighter: {
             padding: 1,
@@ -39,7 +52,6 @@ const mentionStyle = {
             padding: 1,
         },
     },
-
     suggestions: {
         list: {
             backgroundColor: 'black',
@@ -57,50 +69,54 @@ const mentionStyle = {
 };
 
 const PostThread = () => {
-    const [ mounted, setMounted ] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
-    const [ addThread, { isLoading } ] = useAddThreadMutation();
-    const [ mentions, setMentions ] = useState([]); // To track mentions
+    const [addThread, { isLoading }] = useAddThreadMutation();
+    const [mentions, setMentions] = useState<Mention[]>([]);
     const { data: session } = useSession();
 
-    const form = useForm<z.infer<any>>({
+    const form = useForm<ThreadFormValues>({
         defaultValues: {
             content: "",
         },
+        resolver: zodResolver(threadSchema),
     });
 
-    // Ensure the component is only rendered after it's mounted on the client
     useEffect(() => {
         setMounted(true);
     }, []);
 
     if (!mounted) {
-        return null; // Avoid rendering anything during SSR
+        return null;
     }
 
-    const fetchSuggestions = (query, callback) => {
+    const fetchSuggestions = async (query: string, callback: (suggestions: Mention[]) => void) => {
         if (!query) return;
-        fetch(`${process.env.BACKEND_BASE_URL}/api/user-suggestions?query=${query}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session?.access}`,
-            },
-            method: 'GET',
-        }).then((response) => {
-            return response.json();
-        }).then((res) => res?.users?.map((user) => ({
+        try {
+            const response = await fetch(`${process.env.BACKEND_BASE_URL}/api/user-suggestions?query=${query}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access}`,
+                },
+                method: 'GET',
+            });
+            const res = await response.json();
+            const suggestions = res?.users?.map((user: { id: string | number; username: string }) => ({
                 id: user.id,
                 display: user.username,
-            }))
-        ).then(callback)
+            }));
+            callback(suggestions);
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+        }
     };
 
-    const onSubmit = async (values: z.infer<any>) => {
+    const onSubmit = async (values: ThreadFormValues) => {
         try {
             await addThread({
                 content: values.content,
-                mentions: mentions.map((mention: any) => mention.id), // Pass mentioned user IDs
-            }).unwrap();
+                mentions: mentions.map((mention) => mention.id),
+            });
             toast.success("Thread posted successfully");
             setTimeout(() => {
                 router.push("/");
@@ -137,7 +153,7 @@ const PostThread = () => {
                                         trigger="@"
                                         data={fetchSuggestions}
                                         style={{ backgroundColor: "rgb(135 126 255)" }}
-                                        onAdd={(id, display) => {
+                                        onAdd={(id: string | number, display: string) => {
                                             setMentions([...mentions, { id, display }]);
                                         }}
                                         renderSuggestion={(

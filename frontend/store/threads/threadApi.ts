@@ -13,7 +13,10 @@ const threadApi = createApi({
         getThread: builder.query<Thread, number>({
             query: (id) => `threads/${id}`,
         }),
-        addThread: builder.mutation<void, void>({
+        addThread: builder.mutation<void, {
+            content: string;
+            mentions: (string | number)[];
+        }>({
             query: (thread) => ({
                 url: "threads",
                 method: "POST",
