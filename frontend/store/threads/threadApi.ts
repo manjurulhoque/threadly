@@ -7,13 +7,13 @@ const threadApi = createApi({
     baseQuery: DynamicBaseQuery,
     tagTypes: [ "Thread" ],
     endpoints: (builder) => ({
-        getThreads: builder.query<Thread[], void>({
+        getThreads: builder.query<{ threads: Thread[] }, void>({
             query: () => "threads",
         }),
         getThread: builder.query<Thread, number>({
             query: (id) => `threads/${id}`,
         }),
-        addThread: builder.mutation<void, {
+        addThread: builder.mutation<{ thread: Thread }, {
             content: string;
             mentions: (string | number)[];
         }>({

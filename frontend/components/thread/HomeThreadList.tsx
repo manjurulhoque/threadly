@@ -3,19 +3,20 @@
 import { useGetThreadsQuery } from "@/store/threads/threadApi";
 import { useEffect, useState } from "react";
 import ThreadCard from "@/components/cards/ThreadCard";
+import { useThreads } from "@/contexts/ThreadContext";
 
 const HomeThreadList = () => {
-    const {data, isLoading} = useGetThreadsQuery();
+    const { data, isLoading } = useGetThreadsQuery();
     const [mounted, setMounted] = useState(false);
-    const threads = data?.threads || [];
+    const { threads: contextThreads } = useThreads();
+    const threads = [...contextThreads, ...(data?.threads || [])];
 
-    // Ensure the component is only rendered after it's mounted on the client
     useEffect(() => {
         setMounted(true);
     }, []);
 
     if (!mounted) {
-        return null; // Avoid rendering anything during SSR
+        return null;
     }
 
     return (

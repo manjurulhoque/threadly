@@ -12,6 +12,7 @@ import { Loader } from "lucide-react";
 import { Mention, MentionsInput } from "react-mentions";
 import { useSession } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useThreads } from "@/contexts/ThreadContext";
 
 // Define types for mentions
 interface Mention {
@@ -74,6 +75,7 @@ const PostThread = () => {
     const [addThread, { isLoading }] = useAddThreadMutation();
     const [mentions, setMentions] = useState<Mention[]>([]);
     const { data: session } = useSession();
+    const { addThread: addThreadToContext } = useThreads();
 
     const form = useForm<ThreadFormValues>({
         defaultValues: {
@@ -113,10 +115,16 @@ const PostThread = () => {
 
     const onSubmit = async (values: ThreadFormValues) => {
         try {
-            await addThread({
+            const response = await addThread({
                 content: values.content,
                 mentions: mentions.map((mention) => mention.id),
-            });
+            }).unwrap();
+            
+            if (response?.thread) {
+                addThreadToContext(response.thread);
+            }
+            
+            form.reset();
             toast.success("Thread posted successfully");
             setTimeout(() => {
                 router.push("/");

@@ -15,6 +15,7 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider } from "@/components/theme-provider";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
+import { ThreadProvider } from "@/contexts/ThreadContext";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -42,19 +43,19 @@ export default async function RootLayout({children}: { children: React.ReactNode
             >
                 <ReduxProvider>
                     <WebSocketProvider>
-                        <TopBar/>
-
-                        <main className='flex flex-row'>
-                            <LeftSidebar/>
-                            <section className='main-container'>
-                                <div className='w-full max-w-4xl'>{children}</div>
-                            </section>
-                            {/* @ts-ignore */}
-                            <RightSidebar/>
-                        </main>
-
-                        <BottomBar/>
-                        <ToastContainer/>
+                        <ThreadProvider>
+                            <TopBar/>
+                            <main className='flex flex-row'>
+                                <LeftSidebar/>
+                                <section className='main-container'>
+                                    <div className='w-full max-w-4xl'>{children}</div>
+                                </section>
+                                {/* @ts-ignore */}
+                                <RightSidebar/>
+                            </main>
+                            <BottomBar/>
+                            <ToastContainer/>
+                        </ThreadProvider>
                     </WebSocketProvider>
                 </ReduxProvider>
             </ThemeProvider>

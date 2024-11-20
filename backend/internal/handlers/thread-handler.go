@@ -110,7 +110,7 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 		wg.Wait() // Wait for the goroutine to complete
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Thread created successfully"})
+	c.JSON(http.StatusOK, gin.H{"thread": thread})
 }
 
 func (h *ThreadHandler) GetThreadById(c *gin.Context) {
