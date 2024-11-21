@@ -149,6 +149,6 @@
     @apply rounded-3xl dark:bg-primary-500 px-8 py-2 !text-small-regular text-light-1 max-xs:w-full !important;
 }
 
-.mention {
+.mention, .hashtag {
     @apply text-primary-500 !important;
 }

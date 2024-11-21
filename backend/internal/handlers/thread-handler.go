@@ -130,13 +130,13 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 	}
 
 	// Attach hashtags to the thread using GORM M2M relation
-	if len(hashtags) > 0 {
-		for _, hashtag := range hashtags {
-			if err := db.DB.Model(&thread).Association("Threads").Append(&hashtag); err != nil {
-				fmt.Println("Error attaching hashtag to thread:", err)
-			}
+	for _, hashtag := range hashtags {
+		if err := db.DB.Exec("INSERT INTO thread_hash_tags (thread_id, hash_tag_id) VALUES (?, ?)", thread.ID, hashtag.ID).Error; err != nil {
+			fmt.Println("Error inserting hashtag into thread_hash_tags table:", err)
 		}
 	}
+
+	thread.Content = utils.FormatThreadContent(thread.Content)
 
 	c.JSON(http.StatusOK, gin.H{"thread": thread})
 }
