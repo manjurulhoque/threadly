@@ -4,18 +4,36 @@ A modern social media platform built with Next.js and Go, featuring real-time me
 
 ## Features
 
-- 🔐 Authentication with NextAuth.js
+- 🔐 Authentication with NextAuth.js and JWT
 - 🌓 Dark/Light mode theming
 - 💬 Real-time chat messaging
 - 🧵 Thread creation and interactions
 - 💖 Like/Unlike functionality
 - 🔔 Real-time notifications
 - 👥 User profiles and following system
-- 🤝 Community features
+- 🤝 Community features // todo
 - 📱 Responsive design
-- 🔍 User search functionality
-- 🖼️ Image upload support
+- 🔍 User search functionality // todo
+- 🖼️ Image upload support // todo
 - 🌐 WebSocket integration
+
+## Preview
+
+### Home Page
+![Home Page](./screenshots/t1.png)
+
+### Profile Page
+![Profile Page](./screenshots/t2.png)
+
+### Single thread with comments Page
+![Single thread with comments Page](./screenshots/t3.png)
+
+### Notifications Page
+![Notifications Page](./screenshots/t4.png)
+
+### Real time chat Page
+![Chat Page](./screenshots/t5.png)
+
 
 ## Tech Stack
 
