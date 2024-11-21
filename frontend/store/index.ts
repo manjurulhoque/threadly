@@ -5,6 +5,7 @@ import followApi from "@/store/follow/followApi";
 import likeApi from "@/store/likes/likeApi";
 import usersApi from "./users/userApi";
 import notificationApi from "./notifications/notificationApi";
+import hashtagApi from "./hashtag/hashtagApi";
 
 export const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
         [likeApi.reducerPath]: likeApi.reducer,
         [usersApi.reducerPath]: usersApi.reducer,
         [notificationApi.reducerPath]: notificationApi.reducer,
+        [hashtagApi.reducerPath]: hashtagApi.reducer,
     },
     middleware: (getDefaultMiddleware: any) =>
         getDefaultMiddleware({}).concat(
@@ -22,7 +24,8 @@ export const store = configureStore({
             followApi.middleware,
             likeApi.middleware,
             usersApi.middleware,
-            notificationApi.middleware
+            notificationApi.middleware,
+            hashtagApi.middleware
         ),
 });
 
