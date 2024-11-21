@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/db"
-	"github.com/manjurulhoque/threadly/backend/internal/models"
 )
 
 type HashtagHandler struct {}
@@ -15,7 +15,13 @@ func NewHashtagHandler() *HashtagHandler {
 }
 
 func (h *HashtagHandler) GetTrendingHashtags(c *gin.Context) {
-	var hashtags []models.HashTag
+	var hashtags []struct {
+		ID          uint      `json:"id"`
+		Name        string    `json:"name"`
+		CreatedAt   time.Time `json:"created_at"`
+		UpdatedAt   time.Time `json:"updated_at"`
+		ThreadCount int       `json:"thread_count"`
+	}
 
 	// Get trending hashtags with their usage count
 	query := `

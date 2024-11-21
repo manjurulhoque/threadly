@@ -1,17 +1,16 @@
-import { fetchSimilarMinds } from "@/lib/actions/user.actions";
+"use client";
+
 import UserCard from "@/components/cards/UserCard";
-import { User } from "@/types/user.type";
+import { useGetTrendingHashtagsQuery } from "@/store/hashtag/hashtagApi";
+import HashtagCard from "../cards/HashtagCard";
+import { useGetSimilarMindsQuery } from "@/store/users/userApi";
 
+const RightSidebar = () => {
+    const {data: trendingHashtags} = useGetTrendingHashtagsQuery();
+    const hashtags = trendingHashtags?.hashtags || [];
 
-async function RightSidebar() {
-
-    let similarMinds: User[] = [];
-    try {
-        const {data} = await fetchSimilarMinds();
-        similarMinds = data;
-    } catch (error: any) {
-        console.error(`Failed to fetch similar minds: ${error}`);
-    }
+    const {data: similarMindsData} = useGetSimilarMindsQuery();
+    const similarMinds = similarMindsData?.users || [];
 
     return (
         <section className='custom-scrollbar rightsidebar'>
@@ -29,6 +28,23 @@ async function RightSidebar() {
                         </>
                     ) : (
                         <p className='!text-base-regular text-light-3'>No users yet</p>
+                    )}
+                </div>
+            </div>
+            <div className='flex flex-1 flex-col justify-start'>
+                <h3 className='text-heading4-medium dark:text-light-1'>Trending Hashtags</h3>
+                <div className='mt-7 flex w-[350px] flex-col gap-10'>
+                    {hashtags?.length > 0 ? (
+                        <>
+                            {hashtags.map((hashtag) => (
+                                <HashtagCard
+                                    key={hashtag.id}
+                                    hashtag={hashtag}
+                                />
+                            ))}
+                        </>
+                    ) : (
+                        <p className='!text-base-regular text-light-3'>No hashtags yet</p>
                     )}
                 </div>
             </div>

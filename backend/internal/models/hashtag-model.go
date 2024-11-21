@@ -5,7 +5,7 @@ type HashTag struct {
 	Name        string `json:"name"`
 	ThreadCount int    `json:"thread_count,omitempty" gorm:"-"` // This field is not stored in the database
 
-	Threads []Thread `json:"threads" gorm:"many2many:thread_hash_tags;"`
+	Threads []Thread `json:"-" gorm:"many2many:thread_hash_tags;"`
 }
 
 func (h *HashTag) TableName() string {

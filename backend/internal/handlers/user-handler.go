@@ -190,7 +190,7 @@ func (h *UserHandler) GetSimilarMinds(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": users})
+	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
 // IsFollowing Check if current logged-in user is following another user
