@@ -63,6 +63,7 @@ func main() {
 	commentHandler := handlers.NewCommentHandler(commentService, notificationService, threadService)
 	likeHandler := handlers.NewLikeHandler(likeService)
 	notificationHandler := handlers.NewNotificationHandler(notificationService)
+	hashtagHandler := handlers.NewHashtagHandler()
 
 	// Set up WebSocket message handler
 	var wg sync.WaitGroup
@@ -135,6 +136,9 @@ func main() {
 		// Notification routes with auth
 		api.GET("/notifications", authMiddleware, notificationHandler.GetNotifications)
 		api.POST("/notifications/mark-all-as-read", authMiddleware, notificationHandler.MarkAllNotificationsAsRead)
+
+		// Hashtag routes
+		api.GET("/hashtags/trending", hashtagHandler.GetTrendingHashtags)
 	}
 
 	// run the server
