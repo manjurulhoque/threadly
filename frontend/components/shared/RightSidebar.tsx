@@ -6,10 +6,10 @@ import HashtagCard from "../cards/HashtagCard";
 import { useGetSimilarMindsQuery } from "@/store/users/userApi";
 
 const RightSidebar = () => {
-    const {data: trendingHashtags} = useGetTrendingHashtagsQuery();
+    const {data: trendingHashtags, isLoading: loadingHashtags} = useGetTrendingHashtagsQuery();
     const hashtags = trendingHashtags?.hashtags || [];
 
-    const {data: similarMindsData} = useGetSimilarMindsQuery();
+    const {data: similarMindsData, isLoading: loadingSimilarMinds} = useGetSimilarMindsQuery();
     const similarMinds = similarMindsData?.users || [];
 
     return (
@@ -17,7 +17,9 @@ const RightSidebar = () => {
             <div className='flex flex-1 flex-col justify-start'>
                 <h3 className='text-heading4-medium dark:text-light-1'>Similar Minds</h3>
                 <div className='mt-7 flex w-[350px] flex-col gap-10'>
-                    {similarMinds?.length > 0 ? (
+                    {loadingSimilarMinds ? (
+                        <p className='!text-base-regular text-light-3'>Loading...</p>
+                    ) : similarMinds?.length > 0 ? (
                         <>
                             {similarMinds.map((person) => (
                                 <UserCard
@@ -34,7 +36,9 @@ const RightSidebar = () => {
             <div className='flex flex-1 flex-col justify-start'>
                 <h3 className='text-heading4-medium dark:text-light-1'>Trending Hashtags</h3>
                 <div className='mt-7 flex w-[350px] flex-col gap-10'>
-                    {hashtags?.length > 0 ? (
+                    {loadingHashtags ? (
+                        <p className='!text-base-regular text-light-3'>Loading...</p>
+                    ) : hashtags?.length > 0 ? (
                         <>
                             {hashtags.map((hashtag) => (
                                 <HashtagCard
