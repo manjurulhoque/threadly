@@ -2,13 +2,15 @@ package handlers
 
 import (
 	"fmt"
+	"log/slog"
+	"net/http"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/db"
 	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/services"
 	"github.com/manjurulhoque/threadly/backend/pkg/utils"
-	"net/http"
-	"sync"
 )
 
 type ThreadHandler struct {
@@ -63,17 +65,35 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 	}
 
 	usernames := utils.ExtractMentions(input.Content)
+	extractedHashtags := utils.ExtractHashtags(input.Content)
 	var users []models.User
 	var userIDs []uint
+	var hashtags []models.HashTag
 
 	if len(usernames) > 0 {
 		// Fetch user IDs from the database
 		err := db.DB.Where("username IN ?", usernames).Find(&users).Error
-		// If no error, extract user IDs
 		if err == nil {
-			// Extract user IDs
 			for _, user := range users {
 				userIDs = append(userIDs, user.ID)
+			}
+		}
+	}
+
+	if len(extractedHashtags) > 0 {
+		// Fetch existing hashtags from the database
+		err := db.DB.Where("name IN ?", extractedHashtags).Find(&hashtags).Error
+		if err != nil {
+			slog.Error("Error fetching hashtags", "error", err.Error())
+		}
+
+		// Create new hashtags that do not exist
+		for _, hashtagName := range extractedHashtags {
+			if !containsHashtag(hashtags, hashtagName) {
+				newHashtag := models.HashTag{Name: hashtagName}
+				if err := db.DB.Create(&newHashtag).Error; err == nil {
+					hashtags = append(hashtags, newHashtag) // Add new hashtag to the slice
+				}
 			}
 		}
 	}
@@ -90,11 +110,10 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 	// Store mentions in the database
 	if len(userIDs) > 0 {
 		var wg sync.WaitGroup
-
-		wg.Add(1) // Add to the wait group before starting the goroutine
+		wg.Add(1)
 
 		go func(threadID uint, mentionedUserIDs []uint) {
-			defer wg.Done() // Ensure the wait group is marked as done when finished
+			defer wg.Done()
 			for _, userID := range mentionedUserIDs {
 				mention := models.Mention{
 					ThreadId: threadID,
@@ -107,10 +126,28 @@ func (h *ThreadHandler) CreateThread(c *gin.Context) {
 			}
 		}(thread.ID, userIDs)
 
-		wg.Wait() // Wait for the goroutine to complete
+		wg.Wait()
+	}
+
+	// Attach hashtags to the thread using GORM M2M relation
+	if len(hashtags) > 0 {
+		for _, hashtag := range hashtags {
+			if err := db.DB.Model(&thread).Association("Threads").Append(&hashtag); err != nil {
+				fmt.Println("Error attaching hashtag to thread:", err)
+			}
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"thread": thread})
+}
+
+func containsHashtag(hashtags []models.HashTag, name string) bool {
+	for _, hashtag := range hashtags {
+		if hashtag.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *ThreadHandler) GetThreadById(c *gin.Context) {
