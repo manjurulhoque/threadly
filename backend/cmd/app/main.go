@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/manjurulhoque/threadly/backend/internal/config"
 	"github.com/manjurulhoque/threadly/backend/internal/db"
@@ -77,15 +75,15 @@ func main() {
 	utils.SetUserRepo(userRepo)
 
 	// CORS configuration - using a single config instance
-	corsConfig := cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}
-	router.Use(cors.New(corsConfig))
+	// corsConfig := cors.Config{
+	// 	AllowOrigins:     []string{"http://localhost:3000"},
+	// 	AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+	// 	AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           12 * time.Hour,
+	// }
+	// router.Use(cors.New(corsConfig))
 	router.GET("/ws", middlewares.WebSocketAuthMiddleware(userRepo, userService), handlers.HandleConnections)
 
 	// Group API routes for better organization and middleware reuse
