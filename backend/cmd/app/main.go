@@ -41,6 +41,7 @@ func init() {
 func main() {
 	// create a new gin server and run it
 	router := gin.Default()
+	router.Use(middlewares.CORSMiddleware())
 	defer db.CloseDB(db.DB)
 
 	// Initialize repositories with pointer receivers
