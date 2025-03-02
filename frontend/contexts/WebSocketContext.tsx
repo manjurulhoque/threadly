@@ -14,7 +14,7 @@ const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession();
-    const socketUrl = `ws://localhost:8080/ws?token=${session?.access}`;
+    const socketUrl = `ws://${process.env.BACKEND_BASE_URL}/ws?token=${session?.access}`;
 
     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
         shouldReconnect: (closeEvent) => true,
