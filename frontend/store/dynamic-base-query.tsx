@@ -8,7 +8,7 @@ const DynamicBaseQuery = async (args: any, api: any, extraOptions: any) => {
 
         // Initialize the base query with headers prepared
         const baseQuery = fetchBaseQuery({
-            baseUrl: 'http://localhost:8080/api',
+            baseUrl: `${process.env.BACKEND_BASE_URL}/api`,
             prepareHeaders: (headers) => {
                 if (session?.access) {
                     headers.set('Authorization', `Bearer ${session.access}`);
