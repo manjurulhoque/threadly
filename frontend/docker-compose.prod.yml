@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      - NODE_ENV=production
+      - BACKEND_BASE_URL=http://threadly-backend.manjurulhoque.com
+      - NEXTAUTH_SECRET=secret
+      - NEXTAUTH_URL=http://threadly.manjurulhoque.com
+    restart: unless-stopped
+
+  nginx:
+    build: ./deployment/nginx
+    ports:
+      - "3001:80"
+    depends_on:
+      - frontend
+    restart: unless-stopped 

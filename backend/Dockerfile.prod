@@ -1,0 +1,48 @@
+# Build stage
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /app
+
+# Install required build dependencies
+RUN apk add --no-cache gcc musl-dev sqlite
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependencies
+RUN go mod download
+
+# Copy the source code
+COPY . .
+
+# Copy .env.example to .env
+RUN if [ -f .env.example ]; then cp .env.example .env; fi
+
+# Build the application
+RUN CGO_ENABLED=1 GOOS=linux go build -o main ./cmd/app
+
+# Final stage
+FROM alpine:3.19
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates tzdata
+
+# Copy the binary from builder
+COPY --from=builder /app/main .
+COPY --from=builder /app/.env .
+
+# Create uploads directory
+RUN mkdir -p /app/web/uploads && \
+    chmod 755 /app/web/uploads
+
+# Set environment variables
+ENV GIN_MODE=release
+ENV PORT=9000
+
+# Expose the port
+EXPOSE 9000
+
+# Run the application
+CMD ["./main"]
