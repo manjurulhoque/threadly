@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     env: {
-        BACKEND_BASE_URL: 'http://localhost:8080',
-        NEXTAUTH_SECRET: 'my-secret'
+        BACKEND_BASE_URL: process.env.BACKEND_BASE_URL,
+        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET
     },
     images: {
-        domains: ['localhost'],
+        domains: [process.env.BACKEND_BASE_URL, 'localhost'],
     },
     logging: {
         fetches: {
