@@ -49,6 +49,7 @@ const DynamicBaseQuery = async (args: any, api: any, extraOptions: any) => {
             if (session?.access) {
                 headers.set("Authorization", `Bearer ${session.access}`);
             }
+            headers.set("mode", "no-cors");
             // headers.set("Access-Control-Allow-Origin", "*");
             // headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             // headers.set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With");
