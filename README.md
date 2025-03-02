@@ -2,6 +2,8 @@
 
 A modern social media platform built with Next.js and Go, featuring real-time messaging, dark mode, and a clean UI.
 
+Live: [Demo](http://threadly.manjurulhoque.com/)
+
 ## Features
 
 - 🔐 Authentication with NextAuth.js and JWT
