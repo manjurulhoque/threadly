@@ -12,9 +12,9 @@ func CORSMiddleware() gin.HandlerFunc {
         c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Origin, Cache-Control, X-Requested-With")
         c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 
-        // Handle preflight requests
+        // Properly handle preflight requests
         if c.Request.Method == "OPTIONS" {
-            c.Writer.WriteHeader(200)
+            c.AbortWithStatusJSON(200, gin.H{"message": "Preflight OK"})  // ✅ Return JSON response
             return
         }
 
