@@ -7,6 +7,7 @@ type ResponseData = {
 }
 
 interface RequestBody {
+    username: string;
     name: string;
     email: string;
     password: string;
