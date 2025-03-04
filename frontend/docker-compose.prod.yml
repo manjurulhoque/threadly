@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   frontend:
+    image: threadly-frontend
     build:
       context: .
       dockerfile: Dockerfile.prod
@@ -13,6 +14,7 @@ services:
     restart: unless-stopped
 
   nginx:
+    image: threadly-frontend-nginx
     build: ./deployment/nginx
     ports:
       - "3001:80"
