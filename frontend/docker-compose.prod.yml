@@ -13,13 +13,19 @@ services:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://threadly.manjurulhoque.com
     restart: unless-stopped
+    networks:
+        - threadly-network
 
   nginx:
     container_name: threadly-frontend-nginx
     image: threadly-frontend-nginx
     build: ./deployment/nginx
     ports:
-      - "3001:80"
+      - "81:80"
     depends_on:
       - frontend
     restart: unless-stopped
+    networks:
+        - threadly-network
+networks:
+    threadly-network:
