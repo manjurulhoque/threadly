@@ -15,6 +15,8 @@ services:
     restart: unless-stopped
     networks:
         - threadly-network
+    volumes:
+        - threadly-frontend-data:/data
 
   nginx:
     container_name: threadly-frontend-nginx
@@ -29,3 +31,5 @@ services:
         - threadly-network
 networks:
     threadly-network:
+volumes:
+    threadly-frontend-data:
