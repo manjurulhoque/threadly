@@ -1,10 +1,10 @@
 FROM nginx:1.25-alpine
 
 # Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/conf.d/default.conf || true
 
 # Copy custom nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create required directories and set permissions
 RUN mkdir -p /tmp/nginx && \
@@ -17,4 +17,4 @@ RUN mkdir -p /tmp/nginx && \
     chown -R nginx:nginx /var/run/nginx.pid
 
 # Switch to non-root user
-USER nginx 
+USER nginx

@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   frontend:
+    container_name: threadly-frontend
     image: threadly-frontend
     build:
       context: .
@@ -14,10 +15,11 @@ services:
     restart: unless-stopped
 
   nginx:
+    container_name: threadly-frontend-nginx
     image: threadly-frontend-nginx
     build: ./deployment/nginx
     ports:
       - "3001:80"
     depends_on:
       - frontend
-    restart: unless-stopped 
+    restart: unless-stopped
