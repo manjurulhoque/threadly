@@ -3,12 +3,14 @@ package services
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/manjurulhoque/threadly/backend/internal/models"
 	"github.com/manjurulhoque/threadly/backend/internal/repositories"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 // Define constants for token expiration
@@ -23,7 +25,7 @@ type UserService interface {
 	RefreshToken(refreshToken string) (string, error)         // Returns new access token
 	VerifyToken(token string) (*JWTCustomClaims, error)
 	GetUserById(userId uint) (*models.PublicUser, error)
-	UpdateUser(uint, map[string]interface{}) error
+	UpdateUser(uint, map[string]any) error
 	GetSimilarMinds(userId uint) ([]models.PublicUser, error)
 	IsFollowing(followeeId, followerId uint) (bool, error)
 	GetThreadsForUser(userId uint) ([]models.Thread, error)
@@ -141,7 +143,15 @@ func (s *userService) RefreshToken(refreshToken string) (string, error) {
 	}
 
 	// Get the user by ID
-	userId := uint(claims["sub"].(float64))
+	subStr, ok := claims["sub"].(string)
+	if !ok {
+		return "", errors.New("invalid token claims: missing sub")
+	}
+	userId64, err := strconv.ParseUint(subStr, 10, 64)
+	if err != nil {
+		return "", errors.New("invalid token claims: bad sub")
+	}
+	userId := uint(userId64)
 	user, err := s.userRepo.GetUserById(userId)
 	if err != nil {
 		return "", errors.New("user not found")
@@ -174,10 +184,10 @@ func (s *userService) GetUserById(userId uint) (*models.PublicUser, error) {
 	}
 
 	return &models.PublicUser{
-		Id:        user.ID,
-		Name:      user.Name,
-		Username:  user.Username,
-		Image:     user.Image,
+		Id:             user.ID,
+		Name:           user.Name,
+		Username:       user.Username,
+		Image:          user.Image,
 		Bio:            user.Bio,
 		Onboarded:      user.Onboarded,
 		FollowersCount: user.FollowersCount(s.userRepo.GetDB()),
